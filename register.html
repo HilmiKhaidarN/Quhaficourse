@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Daftar</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-bg-deco">
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+    <svg style="position:absolute;bottom:0;left:0;right:0;width:100%;opacity:0.12" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,300 L0,200 Q50,180 100,200 L100,150 Q120,100 140,150 L140,120 Q160,60 180,120 L180,150 Q200,100 220,150 L220,200 Q270,180 320,200 L320,300 Z" fill="white"/>
+      <path d="M400,300 L400,180 Q450,160 500,180 L500,140 Q520,90 540,140 L540,110 Q560,50 580,110 L580,140 Q600,90 620,140 L620,180 Q670,160 720,180 L720,300 Z" fill="white"/>
+      <path d="M800,300 L800,190 Q850,170 900,190 L900,150 Q920,100 940,150 L940,120 Q960,60 980,120 L980,150 Q1000,100 1020,150 L1020,190 Q1070,170 1120,190 L1120,300 Z" fill="white"/>
+    </svg>
+  </div>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <img src="logo/logoQuhafiCourse.png" alt="QuhafCourse" class="auth-logo-img">
+        <h1>Quhafi<span>Course</span></h1>
+        <p>Qur'an, Hadis, Fikih, Islam</p>
+      </div>
+      <div class="auth-title">
+        <h2>Buat Akun Baru</h2>
+        <p>Mulai perjalanan ilmu Islam Anda bersama kami</p>
+      </div>
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <span class="icon" id="i1"></span>
+          <input type="text" id="regNama" placeholder="Nama Lengkap" required>
+        </div>
+        <div class="form-group">
+          <span class="icon" id="i2"></span>
+          <input type="email" id="regEmail" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <span class="icon" id="i3"></span>
+          <input type="text" id="regUsername" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+          <span class="icon" id="i4"></span>
+          <input type="password" id="regPass" placeholder="Password" required>
+          <span class="eye-icon" id="eye1" onclick="togglePass('regPass')"></span>
+        </div>
+        <div class="form-group">
+          <span class="icon" id="i5"></span>
+          <input type="password" id="regPass2" placeholder="Konfirmasi Password" required>
+          <span class="eye-icon" id="eye2" onclick="togglePass('regPass2')"></span>
+        </div>
+        <div id="regError" style="color:#e74c3c;font-size:13px;margin:-8px 0 8px;display:none"></div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="agree" required>
+          <label for="agree">Saya setuju dengan <a href="#">Syarat & Ketentuan</a> dan <a href="#">Kebijakan Privasi</a></label>
+        </div>
+        <button type="submit" class="btn-primary">Daftar</button>
+      </form>
+      <div class="auth-footer">
+        Sudah punya akun? <a href="index.html">Masuk di sini</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script>requireGuest();</script>
+<script>
+  document.getElementById('i1').innerHTML = IC.user;
+  document.getElementById('i2').innerHTML = IC.mail;
+  document.getElementById('i3').innerHTML = IC.tag;
+  document.getElementById('i4').innerHTML = IC.lock;
+  document.getElementById('i5').innerHTML = IC.lock;
+  document.getElementById('eye1').innerHTML = IC.eye;
+  document.getElementById('eye2').innerHTML = IC.eye;
+</script>
+</body>
+</html>

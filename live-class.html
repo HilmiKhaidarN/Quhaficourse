@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Live Class</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+      <div class="page-title">Live Class</div>
+      <div class="page-subtitle">Belajar langsung bersama pengajar</div>
+      <div class="tabs" id="liveTabs">
+        <button class="tab-btn active">Mendatang</button>
+        <button class="tab-btn">Sedang Live</button>
+        <button class="tab-btn">Selesai</button>
+      </div>
+      <div class="live-grid" id="liveGrid"></div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script>
+initLayout('live');
+initTabs('#liveTabs');
+
+let allLiveClasses = [];
+
+function showToastLC(msg) {
+  let t = document.getElementById('lcToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'lcToast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a6b3c;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;z-index:9999';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 3000);
+}
+
+async function loadLiveClasses() {
+  const { data, error } = await _supabase.from('live_classes').select('*').order('created_at', { ascending: false });
+  if (error) { showToastLC('Gagal memuat live class.'); return; }
+  allLiveClasses = data || [];
+  renderLive('Mendatang');
+}
+
+function getReminderKeys() {
+  return JSON.parse(localStorage.getItem('lc_reminders') || '[]');
+}
+
+function toggleReminder(id, title, time) {
+  const reminders = getReminderKeys();
+  const key = 'lc_' + id;
+  if (reminders.includes(key)) {
+    localStorage.setItem('lc_reminders', JSON.stringify(reminders.filter(r => r !== key)));
+    const notifs = JSON.parse(localStorage.getItem('qc_notifs') || '[]');
+    localStorage.setItem('qc_notifs', JSON.stringify(notifs.filter(n => n._lcKey !== key)));
+    showToastLC('Pengingat dibatalkan');
+  } else {
+    reminders.push(key);
+    localStorage.setItem('lc_reminders', JSON.stringify(reminders));
+    const notifs = JSON.parse(localStorage.getItem('qc_notifs') || '[]');
+    notifs.unshift({ id: Date.now(), icon: '🔔', title: 'Pengingat Live Class', body: title + ' · ' + time, href: 'live-class.html', time: 'Baru saja', read: false, _lcKey: key });
+    localStorage.setItem('qc_notifs', JSON.stringify(notifs));
+    showToastLC('Pengingat ditambahkan!');
+  }
+  renderLive('Mendatang');
+}
+
+function renderLive(tabLabel) {
+  let list;
+  if (tabLabel === 'Sedang Live') list = allLiveClasses.filter(l => l.status === 'live');
+  else if (tabLabel === 'Selesai') list = allLiveClasses.filter(l => l.status === 'selesai');
+  else list = allLiveClasses.filter(l => l.status === 'mendatang');
+
+  const el = document.getElementById('liveGrid');
+  if (!list.length) {
+    const msg = tabLabel === 'Sedang Live' ? 'Tidak ada live class yang sedang berlangsung.'
+      : tabLabel === 'Selesai' ? 'Belum ada live class yang selesai.'
+      : 'Belum ada jadwal live class mendatang.';
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-light)"><div style="font-size:40px;margin-bottom:12px">📺</div><p style="font-size:14px">' + msg + '</p></div>';
+    return;
+  }
+
+  const reminders = getReminderKeys();
+  el.innerHTML = list.map(l => {
+    const reminded = reminders.includes('lc_' + l.id);
+    const safeTitle = l.title.replace(/'/g, "\\'");
+    const safeTime = (l.time || '').replace(/'/g, "\\'");
+    return '<div class="live-card">'
+      + '<div class="lc-icon" style="background:#e8f5ee;color:#1a6b3c">' + IC.video + '</div>'
+      + '<div class="lc-info">'
+      + '<h4>' + l.title + (l.status === 'live' ? ' <span class="live-badge" style="margin-left:8px">LIVE</span>' : '') + '</h4>'
+      + '<div class="lc-meta">' + (l.meta || '') + '</div>'
+      + '<div class="lc-time">' + (l.time || '') + '</div>'
+      + '</div>'
+      + (l.status === 'live'
+        ? '<button class="btn-gabung-live" onclick="window.open(\'' + (l.url || '#') + '\',\'_blank\')">Gabung</button>'
+        : l.status === 'mendatang'
+        ? '<button class="btn-ingatkan ' + (reminded ? 'active' : '') + '" style="' + (reminded ? 'background:#e8f5ee;color:#1a6b3c;border-color:#1a6b3c' : '') + '" onclick="toggleReminder(\'' + l.id + '\',\'' + safeTitle + '\',\'' + safeTime + '\')">' + (reminded ? '🔔 Diingatkan' : 'Ingatkan') + '</button>'
+        : '<span style="font-size:12px;color:var(--text-light)">Selesai</span>')
+      + '</div>';
+  }).join('');
+}
+
+document.querySelectorAll('#liveTabs .tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => renderLive(btn.textContent.trim()));
+});
+
+loadLiveClasses();
+</script>
+</body>
+</html>

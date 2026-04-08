@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Materi</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+      <div class="page-title">Materi</div>
+      <div class="page-subtitle">Jelajahi berbagai materi pembelajaran</div>
+
+      <div class="materi-tabs" id="materiTabs">
+        <button class="materi-tab active">Fikih</button>
+        <button class="materi-tab">Akidah</button>
+        <button class="materi-tab">Akhlak</button>
+        <button class="materi-tab">Qurdis</button>
+        <button class="materi-tab">Sejarah</button>
+      </div>
+
+      <div class="materi-grid" id="materiGrid"></div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+</script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script>
+(async () => { await initLayout('materi'); })();
+
+const PENGAJAR = {
+  fikih:   'Afifah Adawiyyah',
+  akidah:  'Soni Sultansah',
+  akhlak:  'Farah Fathia Salimatul Haq',
+  sejarah: 'Abdul Lathif Ahmad Hamid',
+  qurdis:  'Putri Salsabilah Agasha',
+};
+
+const DATA = {
+  fikih: [
+    { icon: IC.scale,      bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 1', title: 'Thaharah (Bersuci)',       desc: 'Mempelajari tata cara bersuci dalam Islam secara lengkap dan mudah dipahami.', pct: 0, fill: '', href: 'belajar-thaharah.html' },
+    { icon: IC.chalkboard, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 2', title: 'Shalat, Syarat dan Rukun', desc: 'Memahami syarat sah shalat, rukun shalat, dan hal-hal yang membatalkan shalat.', pct: 0, fill: '', href: 'belajar-thaharah.html' },
+    { icon: IC.moon,       bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 3', title: 'Zakat dan Sedekah',         desc: 'Hukum, syarat, dan tata cara menunaikan zakat serta keutamaan sedekah.',       pct: 0, fill: '', href: 'belajar-thaharah.html' },
+    { icon: IC.book,       bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 4', title: 'Puasa Ramadan',             desc: 'Hukum puasa, syarat wajib, hal yang membatalkan, dan keutamaan Ramadan.',      pct: 0, fill: '', href: 'belajar-thaharah.html' },
+    { icon: IC.landmark,   bg: 'linear-gradient(135deg,#e8f4fd,#bee3f8)', color: '#2980b9', bab: 'Bab 5', title: 'Haji dan Umrah',            desc: 'Tata cara pelaksanaan ibadah haji dan umrah sesuai tuntunan Rasulullah.',      pct: 0,  fill: '',     href: 'belajar-thaharah.html' },
+    { icon: IC.heart,      bg: 'linear-gradient(135deg,#fce8e8,#f5c6c6)', color: '#c0392b', bab: 'Bab 6', title: 'Munakahat (Pernikahan)',    desc: 'Hukum pernikahan dalam Islam, syarat, rukun, dan hikmahnya.',                 pct: 0,  fill: '',     href: 'belajar-thaharah.html' },
+  ],
+  akidah: [
+    { icon: IC.moon,     bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 1', title: 'Pengertian Akidah & Rukun Iman', desc: 'Memahami pengertian akidah dan enam rukun iman dalam Islam.',                    pct: 0, fill: '', href: 'belajar-akidah.html' },
+    { icon: IC.star,     bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 2', title: 'Iman kepada Allah',              desc: 'Memahami tauhid: Rububiyyah, Uluhiyyah, dan Asma wa Shifat Allah.',            pct: 0, fill: '', href: 'belajar-akidah.html' },
+    { icon: IC.award,    bg: 'linear-gradient(135deg,#e8f4fd,#bee3f8)', color: '#2980b9', bab: 'Bab 3', title: 'Iman kepada Malaikat',           desc: 'Mengenal malaikat Allah, sifat-sifatnya, dan tugas-tugasnya.',                 pct: 0, fill: '', href: 'belajar-akidah.html' },
+    { icon: IC.bookOpen, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 4', title: 'Iman kepada Kitab-kitab Allah', desc: 'Mengenal kitab-kitab Allah dan keistimewaan Al-Qur\'an.',                       pct: 0, fill: '', href: 'belajar-akidah.html' },
+    { icon: IC.user,     bg: 'linear-gradient(135deg,#fce8e8,#f5c6c6)', color: '#c0392b', bab: 'Bab 5', title: 'Iman kepada Para Rasul',        desc: 'Mengenal 25 nabi dan rasul serta sifat wajib mereka.',                         pct: 0, fill: '', href: 'belajar-akidah.html' },
+    { icon: IC.trophy,   bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 6', title: 'Iman kepada Hari Akhir',        desc: 'Memahami tahapan kehidupan setelah mati dan tanda-tanda kiamat.',              pct: 0, fill: '', href: 'belajar-akidah.html' },
+    { icon: IC.scale,    bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 7', title: 'Iman kepada Qadha & Qadar',     desc: 'Memahami takdir Allah dan hikmah beriman kepada qadha dan qadar.',             pct: 0, fill: '', href: 'belajar-akidah.html' },
+  ],
+  akhlak: [
+    { icon: IC.heart,    bg: 'linear-gradient(135deg,#fce8e8,#f5c6c6)', color: '#c0392b', bab: 'Bab 1', title: 'Pengertian Akhlak',          desc: 'Memahami pengertian dan kedudukan akhlak dalam Islam.',                   pct: 0, fill: '', href: 'belajar-akhlak.html' },
+    { icon: IC.award,    bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 2', title: 'Jujur (Ash-Shidq)',           desc: 'Keutamaan jujur dan bahaya dusta dalam kehidupan seorang Muslim.',        pct: 0, fill: '', href: 'belajar-akhlak.html' },
+    { icon: IC.heart,    bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 3', title: 'Sabar (Ash-Shabr)',           desc: 'Tiga jenis sabar dan cara melatih kesabaran dalam kehidupan.',            pct: 0, fill: '', href: 'belajar-akhlak.html' },
+    { icon: IC.star,     bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 4', title: 'Syukur (Asy-Syukr)',          desc: 'Hakikat syukur dan cara bersyukur kepada Allah ?.',                       pct: 0, fill: '', href: 'belajar-akhlak.html' },
+    { icon: IC.user,     bg: 'linear-gradient(135deg,#e8f4fd,#bee3f8)', color: '#2980b9', bab: 'Bab 5', title: 'Tawadhu\' (Rendah Hati)',     desc: 'Keutamaan rendah hati dan bahaya sombong dalam Islam.',                   pct: 0, fill: '', href: 'belajar-akhlak.html' },
+    { icon: IC.scale,    bg: 'linear-gradient(135deg,#fce8e8,#f5c6c6)', color: '#c0392b', bab: 'Bab 6', title: 'Akhlak Tercela',              desc: 'Ghibah, namimah, hasad, riya\' — akhlak yang harus dihindari.',           pct: 0, fill: '', href: 'belajar-akhlak.html' },
+    { icon: IC.bookOpen, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 7', title: 'Akhlak kepada Orang Tua',    desc: 'Birrul walidain — berbakti kepada orang tua dalam Islam.',                pct: 0, fill: '', href: 'belajar-akhlak.html' },
+  ],
+  qurdis: [
+    { icon: IC.bookOpen, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 1', title: "Pengertian & Sejarah Al-Qur'an", desc: "Pengertian, nama-nama, dan sejarah turunnya Al-Qur'an.",          pct: 0, fill: '', href: 'belajar-qurdis.html' },
+    { icon: IC.book,     bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 2', title: 'Asbabun Nuzul',                   desc: 'Sebab-sebab turunnya ayat Al-Qur\'an dan manfaat mempelajarinya.', pct: 0, fill: '', href: 'belajar-qurdis.html' },
+    { icon: IC.moon,     bg: 'linear-gradient(135deg,#e8f4fd,#bee3f8)', color: '#2980b9', bab: 'Bab 3', title: 'Makki dan Madani',                 desc: 'Perbedaan ayat Makki dan Madani beserta ciri-cirinya.',           pct: 0, fill: '', href: 'belajar-qurdis.html' },
+    { icon: IC.scale,    bg: 'linear-gradient(135deg,#fce8e8,#f5c6c6)', color: '#c0392b', bab: 'Bab 4', title: 'Nasikh dan Mansukh',               desc: 'Ayat yang menghapus dan yang dihapus dalam Al-Qur\'an.',          pct: 0, fill: '', href: 'belajar-qurdis.html' },
+    { icon: IC.fileText, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 5', title: 'Pengertian Hadits',                desc: 'Pengertian hadits, unsur-unsurnya, dan pembagian berdasarkan kualitas.', pct: 0, fill: '', href: 'belajar-qurdis.html' },
+    { icon: IC.award,    bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 6', title: 'Kitab-kitab Hadits Utama',         desc: 'Al-Kutub As-Sittah dan kitab-kitab hadits penting lainnya.',     pct: 0, fill: '', href: 'belajar-qurdis.html' },
+    { icon: IC.book,     bg: 'linear-gradient(135deg,#e8f4fd,#bee3f8)', color: '#2980b9', bab: 'Bab 7', title: 'Tajwid: Nun Mati & Tanwin',        desc: 'Hukum bacaan nun mati, tanwin, dan mim mati dalam Al-Qur\'an.',  pct: 0, fill: '', href: 'belajar-qurdis.html' },
+  ],
+  sejarah: [
+    { icon: IC.landmark, bg: 'linear-gradient(135deg,#e8f4fd,#bee3f8)', color: '#2980b9', bab: 'Bab 1', title: 'Sejarah Pra-Islam (Jahiliyyah)',   desc: 'Kondisi dunia dan jazirah Arab sebelum datangnya Islam.',              pct: 0, fill: '', href: 'belajar-sejarah.html' },
+    { icon: IC.user,     bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 2', title: 'Kelahiran & Masa Muda Nabi ?',     desc: 'Nasab, kelahiran, dan perjalanan hidup Nabi Muhammad ?.',             pct: 0, fill: '', href: 'belajar-sejarah.html' },
+    { icon: IC.bookOpen, bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 3', title: 'Dakwah di Makkah',                  desc: 'Fase dakwah sirriyyah, jahriyyah, dan Isra\' Mi\'raj.',               pct: 0, fill: '', href: 'belajar-sejarah.html' },
+    { icon: IC.heart,    bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 4', title: 'Hijrah & Dakwah di Madinah',        desc: 'Hijrah, pembangunan Madinah, perang-perang besar, dan Fathu Makkah.', pct: 0, fill: '', href: 'belajar-sejarah.html' },
+    { icon: IC.trophy,   bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 5', title: 'Khulafaur Rasyidin',                desc: 'Empat khalifah pertama: Abu Bakar, Umar, Utsman, dan Ali.',           pct: 0, fill: '', href: 'belajar-sejarah.html' },
+    { icon: IC.scale,    bg: 'linear-gradient(135deg,#e8f4fd,#bee3f8)', color: '#2980b9', bab: 'Bab 6', title: 'Dinasti Umayyah & Abbasiyah',       desc: 'Ekspansi Islam dan zaman keemasan peradaban Islam.',                  pct: 0, fill: '', href: 'belajar-sejarah.html' },
+    { icon: IC.landmark, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 7', title: 'Islam di Nusantara',                desc: 'Masuknya Islam ke Indonesia dan peran Wali Songo.',                   pct: 0, fill: '', href: 'belajar-sejarah.html' },
+  ],
+};
+
+const tabKeys = ['fikih','akidah','akhlak','qurdis','sejarah'];
+let activeTab = 'fikih';
+
+function renderCards(key) {
+  document.getElementById('materiGrid').innerHTML = DATA[key].map(c => `
+    <div class="materi-card" onclick="window.location.href='${c.href}'" style="cursor:pointer">
+      <div class="materi-thumb" style="background:${c.bg};color:${c.color}">
+        ${c.icon}<span class="thumb-badge">${c.bab}</span>
+      </div>
+      <div class="materi-body">
+        <h4>${c.title}</h4>
+        <p>${c.desc}</p>
+        <div class="materi-pengajar">?? ${PENGAJAR[key]}</div>
+        <div class="materi-footer">
+          <div class="progress-bar"><div class="progress-fill ${c.fill}" style="width:${c.pct}%"></div></div>
+          <span>${c.pct}%</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+document.querySelectorAll('.materi-tab').forEach((tab, i) => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.materi-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderCards(tabKeys[i]);
+  });
+});
+
+renderCards('fikih');
+</script>
+</body>
+</html>

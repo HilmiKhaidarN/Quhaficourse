@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Kelas Saya</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+      <div class="page-title">Kelas Saya</div>
+      <div class="page-subtitle">Kelas yang sedang Anda ikuti</div>
+
+      <div class="tabs" id="kelasTabs">
+        <button class="tab-btn active">Aktif</button>
+        <button class="tab-btn">Selesai</button>
+        <button class="tab-btn">Ditunda</button>
+      </div>
+
+      <div class="kelas-list" id="kelasList"></div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+</script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script>
+(async () => { await initLayout('kelas'); })();
+initTabs('#kelasTabs');
+
+const KURSUS_LIST = [
+  { key:'fikih',   icon: IC.scale,    bg: '#e8f5ee', color: '#1a6b3c', title: 'Fikih',                    meta: 'Afifah Adawiyyah · 12 Materi · 10 Jam',         totalMat: 12, fill: '',       href: 'belajar-thaharah.html' },
+  { key:'akidah',  icon: IC.moon,     bg: '#e8f5ee', color: '#1a6b3c', title: 'Akidah',                   meta: 'Soni Sultansah · 8 Materi · 7 Jam',              totalMat: 8,  fill: '',       href: 'belajar-akidah.html' },
+  { key:'akhlak',  icon: IC.heart,    bg: '#fef9e7', color: '#c9a227', title: 'Akhlak',                   meta: 'Farah Fathia Salimatul Haq · 10 Materi · 8 Jam', totalMat: 10, fill: 'gold',   href: 'belajar-akhlak.html' },
+  { key:'qurdis',  icon: IC.book,     bg: '#e8f5ee', color: '#1a6b3c', title: 'Quran Hadits',             meta: 'Putri Salsabilah Agasha · 15 Materi · 12 Jam',   totalMat: 15, fill: '',       href: 'belajar-qurdis.html' },
+  { key:'sejarah', icon: IC.landmark, bg: '#fef9e7', color: '#c9a227', title: 'Sejarah Kebudayaan Islam', meta: 'Abdul Lathif Ahmad Hamid · 7 Materi · 6 Jam',    totalMat: 7,  fill: 'orange', href: 'belajar-sejarah.html' },
+];
+
+function renderKelas(filter) {
+  const all = KURSUS_LIST.map(k => ({
+    ...k, pct: parseInt(localStorage.getItem('progress_' + k.key) || '0', 10),
+  }));
+  let list;
+  if (filter === 'Selesai') list = all.filter(k => k.pct >= 100);
+  else if (filter === 'Ditunda') list = [];
+  else list = all.filter(k => k.pct > 0 && k.pct < 100);
+
+  const el = document.getElementById('kelasList');
+  if (list.length === 0) {
+    const msg = filter === 'Aktif'
+      ? 'Belum ada kelas yang dimulai. <a href="materi.html">Mulai belajar</a>'
+      : filter === 'Selesai' ? 'Belum ada kursus yang selesai.' : 'Tidak ada kelas yang ditunda.';
+    el.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--text-light);font-size:13px">${msg}</div>`;
+    return;
+  }
+  el.innerHTML = list.map(i => {
+    const done = Math.round((i.pct / 100) * i.totalMat);
+    return `
+    <div class="kelas-item">
+      <div class="ki-icon" style="background:${i.bg};color:${i.color}">${i.icon}</div>
+      <div class="ki-info">
+        <h4>${i.title}</h4>
+        <div class="ki-meta">${i.meta}</div>
+        <div class="ki-progress">
+          <div class="progress-bar"><div class="progress-fill ${i.fill}" style="width:${i.pct}%"></div></div>
+          <span>${i.pct}% · ${done}/${i.totalMat} Materi</span>
+        </div>
+      </div>
+      <div class="ki-action">
+        <span class="badge-status ${i.pct >= 100 ? 'selesai' : 'aktif'}">${i.pct >= 100 ? 'Selesai' : 'Aktif'}</span>
+        <button class="btn-lanjut" onclick="window.location.href='${i.href}'">${i.pct >= 100 ? 'Ulangi' : 'Lanjutkan'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.querySelectorAll('#kelasTabs .tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => renderKelas(btn.textContent.trim()));
+});
+
+renderKelas('Aktif');
+</script>
+</body>
+</html>

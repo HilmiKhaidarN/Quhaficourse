@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Sertifikat</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sertifikat.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+
+      <!-- LIST VIEW -->
+      <div id="viewList">
+        <div class="page-title">Sertifikat</div>
+        <div class="page-subtitle">Sertifikat yang telah Anda raih</div>
+
+        <div class="sertif-tabs">
+          <button class="stab active" onclick="filterSertif('diperoleh',this)">?? Diperoleh</button>
+          <button class="stab" onclick="filterSertif('tersedia',this)">?? Tersedia</button>
+        </div>
+
+        <div id="sertifGrid" class="sertif-grid"></div>
+      </div>
+
+      <!-- PREVIEW VIEW -->
+      <div id="viewPreview" style="display:none">
+        <button class="sertif-back" onclick="backToList()">? Kembali ke Sertifikat</button>
+        <div id="previewArea"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL SERTIFIKAT -->
+<div class="sertif-modal-overlay" id="sertifModal" onclick="closeModal()">
+  <div class="sertif-modal-inner" onclick="event.stopPropagation()">
+    <div class="sertif-modal-actions">
+      <button class="sma-btn" onclick="downloadSertif()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Unduh PDF
+      </button>
+      <button class="sma-btn" onclick="shareSertif()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Bagikan
+      </button>
+      <button class="sma-close" onclick="closeModal()">?</button>
+    </div>
+    <div id="modalCertContent"></div>
+  </div>
+</div>
+
+<div class="sertif-toast" id="sertifToast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+</script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script src="sertifikat.js"></script>
+</body>
+</html>

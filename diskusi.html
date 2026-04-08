@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Diskusi</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="diskusi.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+
+      <!-- LIST VIEW -->
+      <div id="viewList">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div class="page-title">Diskusi</div>
+          <button class="btn-buat-diskusi" onclick="openModal()">
+            <span id="iconPlus"></span> Buat Diskusi
+          </button>
+        </div>
+        <div class="page-subtitle">Berdiskusi dan bertanya ilmu</div>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+          <div class="diskusi-tabs">
+            <button class="dtab active" onclick="filterThread('terbaru',this)">Terbaru</button>
+            <button class="dtab" onclick="filterThread('populer',this)">Populer</button>
+            <button class="dtab" onclick="filterThread('belum',this)">Belum Dijawab</button>
+            <button class="dtab" onclick="filterThread('terjawab',this)">✅ Terjawab</button>
+          </div>
+          <div class="diskusi-search">
+            <span id="iconSearch"></span>
+            <input type="text" id="searchInput" placeholder="Cari diskusi..." oninput="renderThreadList()">
+          </div>
+          <select class="diskusi-filter" id="filterKategori" onchange="renderThreadList()">
+            <option value="">Semua Kategori</option>
+            <option value="Fikih">Fikih</option>
+            <option value="Akidah">Akidah</option>
+            <option value="Akhlak">Akhlak</option>
+            <option value="Qurdis">Qurdis</option>
+            <option value="Sejarah">Sejarah</option>
+          </select>
+        </div>
+
+        <div id="threadList"></div>
+      </div>
+
+      <!-- THREAD DETAIL VIEW -->
+      <div id="viewThread" style="display:none">
+        <div id="threadDetail"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL BUAT DISKUSI -->
+<div class="diskusi-modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="diskusi-modal" onclick="event.stopPropagation()">
+    <div class="dm-header">
+      <h3>Buat Diskusi Baru</h3>
+      <button class="dm-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="dm-body">
+      <div class="dm-field">
+        <label>Judul Diskusi <span style="color:#e74c3c">*</span></label>
+        <input type="text" id="newTitle" placeholder="Tulis judul pertanyaan atau topik diskusi..." maxlength="120">
+        <div class="dm-char" id="titleChar">0/120</div>
+      </div>
+      <div class="dm-field">
+        <label>Kategori <span style="color:#e74c3c">*</span></label>
+        <select id="newKategori">
+          <option value="">Pilih kategori...</option>
+          <option value="Fikih">Fikih</option>
+          <option value="Akidah">Akidah</option>
+          <option value="Akhlak">Akhlak</option>
+          <option value="Qurdis">Qurdis</option>
+          <option value="Sejarah">Sejarah</option>
+        </select>
+      </div>
+      <div class="dm-field">
+        <label>Label</label>
+        <select id="newLabel">
+          <option value="">Tanpa label</option>
+          <option value="Pertanyaan">❓ Pertanyaan</option>
+          <option value="Diskusi">💬 Diskusi</option>
+          <option value="Pengumuman">📢 Pengumuman</option>
+        </select>
+      </div>
+      <div class="dm-field">
+        <label>Isi Diskusi <span style="color:#e74c3c">*</span></label>
+        <textarea id="newBody" rows="5" placeholder="Jelaskan pertanyaan atau topik Anda secara detail..." maxlength="1000"></textarea>
+        <div class="dm-char" id="bodyChar">0/1000</div>
+      </div>
+    </div>
+    <div class="dm-footer">
+      <button class="dm-btn-cancel" onclick="closeModal()">Batal</button>
+      <button class="dm-btn-submit" onclick="submitThread()">Posting Diskusi</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="diskusi-toast" id="diskusiToast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script src="diskusi.js"></script>
+</body>
+</html>

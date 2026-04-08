@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Tugas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+      <div class="page-title">Tugas</div>
+      <div class="page-subtitle">Kerjakan dan kumpulkan tugas</div>
+      <div class="tabs" id="tugasTabs">
+        <button class="tab-btn active">Aktif</button>
+        <button class="tab-btn">Selesai</button>
+      </div>
+      <div class="tugas-list" id="tugasList"></div>
+    </main>
+  </div>
+</div>
+<div id="modalKumpul" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:480px;margin:20px">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:4px" id="modalTugasTitle"></h3>
+    <p style="font-size:13px;color:var(--text-light);margin-bottom:20px">Isi form pengumpulan tugas</p>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:6px">Catatan <span style="color:#e74c3c">*</span></label>
+      <textarea id="kumpulCatatan" rows="4" placeholder="Jelaskan apa yang sudah kamu kerjakan..." maxlength="500" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:13px;resize:vertical;box-sizing:border-box"></textarea>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:6px">Link Tugas</label>
+      <input type="url" id="kumpulLink" placeholder="https://drive.google.com/..." style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:13px;box-sizing:border-box">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeModalKumpul()" style="padding:9px 18px;border:1.5px solid #ddd;border-radius:8px;background:#fff;font-size:13px;cursor:pointer">Batal</button>
+      <button onclick="submitKumpul()" style="padding:9px 18px;background:#1a6b3c;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Kumpulkan</button>
+    </div>
+  </div>
+</div>
+<div id="tugasToast" style="position:fixed;bottom:24px;right:24px;background:#1a6b3c;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;z-index:9999;pointer-events:none"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script>
+initLayout('tugas');
+initTabs('#tugasTabs');
+let allTasks=[],userSubmissions={},activeTaskId=null;
+function showToastTugas(msg,isError=false){const t=document.getElementById('tugasToast');t.textContent=msg;t.style.background=isError?'#c0392b':'#1a6b3c';t.style.opacity='1';setTimeout(()=>t.style.opacity='0',3000);}
+async function loadTasks(){const cu=getCurrentUser();const{data:tasks,error}=await _supabase.from('tasks').select('*').order('created_at',{ascending:false});if(error){showToastTugas('Gagal memuat tugas.',true);return;}allTasks=tasks||[];if(cu){const{data:subs}=await _supabase.from('task_submissions').select('*').eq('user_username',cu.username);userSubmissions={};(subs||[]).forEach(s=>{userSubmissions[s.task_id]=s;});}renderTasks('Aktif');}
+function renderTasks(filter){const list=filter==='Selesai'?allTasks.filter(t=>userSubmissions[t.id]):allTasks.filter(t=>!userSubmissions[t.id]);const el=document.getElementById('tugasList');if(!list.length){el.innerHTML='<div style="text-align:center;padding:60px 20px;color:var(--text-light)"><div style="font-size:40px;margin-bottom:12px">📋</div><p>'+(filter==='Selesai'?'Belum ada tugas yang selesai.':'Belum ada tugas aktif.')+'</p></div>';return;}el.innerHTML=list.map(t=>{const sub=userSubmissions[t.id];let statusHtml='',actionHtml='';if(sub){if(sub.grade!=null){statusHtml='<span class="badge-tugas dinilai" style="color:#2980b9">Dinilai</span>';actionHtml='<div style="font-size:13px;color:#2980b9;font-weight:600;margin-left:10px">Nilai: '+sub.grade+'</div>';}else{statusHtml='<span class="badge-tugas dikumpul" style="color:#1a6b3c">Dikumpulkan</span>';}}else{statusHtml='<span class="badge-tugas belum" style="color:#e67e22">Belum Dikumpul</span>';actionHtml='<button class="btn-mulai" style="margin-left:10px" onclick="openModalKumpul(\''+t.id+'\',\''+t.title.replace(/'/g,"\\'")+'\')">Kumpulkan</button>';}return '<div class="tugas-item"><div class="qi-icon" style="background:#e8f5ee;color:#1a6b3c">'+IC.clipboardList+'</div><div class="ti-info"><h4>'+t.title+'</h4><p>'+t.subject+'</p><div class="ti-deadline">Deadline: '+t.deadline+'</div>'+(t.description?'<div style="font-size:12px;color:#666;margin-top:4px">'+t.description+'</div>':'')+(sub&&sub.link?'<div style="font-size:12px;margin-top:4px">Link: <a href="'+sub.link+'" target="_blank" style="color:#2980b9">Lihat file</a></div>':'')+(sub&&sub.notes?'<div style="font-size:12px;color:#666;margin-top:4px">'+sub.notes+'</div>':'')+'</div>'+statusHtml+actionHtml+'</div>';}).join('');}
+function openModalKumpul(taskId,taskTitle){activeTaskId=taskId;document.getElementById('modalTugasTitle').textContent=taskTitle;document.getElementById('kumpulCatatan').value='';document.getElementById('kumpulLink').value='';document.getElementById('modalKumpul').style.display='flex';}
+function closeModalKumpul(){document.getElementById('modalKumpul').style.display='none';activeTaskId=null;}
+async function submitKumpul(){const notes=document.getElementById('kumpulCatatan').value.trim();const link=document.getElementById('kumpulLink').value.trim();if(!notes){showToastTugas('Catatan tidak boleh kosong',true);return;}const cu=getCurrentUser();if(!cu){showToastTugas('Silakan login terlebih dahulu.',true);return;}const{error}=await _supabase.from('task_submissions').insert({task_id:activeTaskId,user_username:cu.username,user_name:cu.nama,notes,link:link||null});if(error){showToastTugas('Gagal mengumpulkan tugas.',true);return;}closeModalKumpul();showToastTugas('Tugas berhasil dikumpulkan!');await loadTasks();}
+document.querySelectorAll('#tugasTabs .tab-btn').forEach(btn=>{btn.addEventListener('click',()=>renderTasks(btn.textContent.trim()));});
+document.getElementById('modalKumpul').addEventListener('click',function(e){if(e.target===this)closeModalKumpul();});
+loadTasks();
+</script>
+</body>
+</html>

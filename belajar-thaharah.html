@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Thaharah (Bersuci)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="belajar.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="kelas.html">Kelas</a> › <a href="materi.html">Fikih</a> › <span>Thaharah (Bersuci)</span>
+      </div>
+
+      <div class="belajar-layout">
+        <!-- Sidebar Materi -->
+        <aside class="materi-sidebar">
+          <div class="materi-sidebar-title">Daftar Materi</div>
+          <div class="materi-sidebar-list" id="materiSidebarList"></div>
+        </aside>
+
+        <!-- Konten Utama -->
+        <div class="belajar-main" id="belajarMain">
+          <!-- Diisi oleh JS -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+</script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script src="belajar-thaharah.js"></script>
+</body>
+</html>

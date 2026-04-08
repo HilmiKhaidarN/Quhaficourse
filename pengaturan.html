@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Pengaturan</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="pengaturan.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+      <div class="page-title">Pengaturan</div>
+      <div class="page-subtitle">Kelola pengaturan akun Anda</div>
+
+      <!-- Tab Navigation -->
+      <div class="sett-tabs">
+        <button class="sett-tab active" onclick="switchTab('akun', this)">
+          <span id="ti1"></span> Akun
+        </button>
+        <button class="sett-tab" onclick="switchTab('notifikasi', this)">
+          <span id="ti2"></span> Notifikasi
+        </button>
+        <button class="sett-tab" onclick="switchTab('privasi', this)">
+          <span id="ti3"></span> Privasi
+        </button>
+        <button class="sett-tab" onclick="switchTab('keamanan', this)">
+          <span id="ti4"></span> Keamanan
+        </button>
+      </div>
+
+      <!-- Toast -->
+      <div class="sett-toast" id="settToast"></div>
+
+      <!-- TAB: AKUN -->
+      <div class="sett-content active" id="tab-akun">
+        <div class="sett-grid">
+          <div class="sett-card">
+            <div class="sett-card-title">Informasi Pribadi</div>
+            <div class="sett-avatar-section">
+              <div class="sett-avatar-wrap">
+                <div class="sett-avatar" id="avatarPreview"></div>
+                <div class="sett-avatar-overlay" onclick="document.getElementById('avatarInput').click()">
+                  <span id="camIcon"></span>
+                </div>
+              </div>
+              <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="handleAvatarChange(event)">
+              <div>
+                <div style="font-size:14px;font-weight:700;margin-bottom:4px">Foto Profil</div>
+                <div style="font-size:12px;color:var(--text-light);margin-bottom:10px">JPG, PNG maks. 2MB</div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn-sett-outline" onclick="document.getElementById('avatarInput').click()">Ubah Foto</button>
+                  <button class="btn-sett-danger" onclick="removeAvatar()">Hapus</button>
+                </div>
+              </div>
+            </div>
+            <div class="sett-form">
+              <div class="sett-row">
+                <div class="sett-field">
+                  <label>Nama Lengkap</label>
+                  <input type="text" id="namaLengkap" value="Aisyah Rahma">
+                </div>
+                <div class="sett-field">
+                  <label>Username</label>
+                  <input type="text" id="username" value="aisyah_rahma">
+                </div>
+              </div>
+              <div class="sett-row">
+                <div class="sett-field">
+                  <label>Email</label>
+                  <input type="email" id="email" value="aisyah@email.com">
+                </div>
+                <div class="sett-field">
+                  <label>Nomor Telepon</label>
+                  <input type="tel" id="telepon" placeholder="+62 812 xxxx xxxx">
+                </div>
+              </div>
+              <div class="sett-field">
+                <label>Bio / Tentang Saya</label>
+                <textarea id="bio" rows="3" placeholder="Ceritakan sedikit tentang diri Anda...">Seorang pelajar yang bersemangat untuk memperdalam ilmu agama Islam.</textarea>
+              </div>
+              <div class="sett-row">
+                <div class="sett-field">
+                  <label>Bahasa</label>
+                  <select id="bahasa">
+                    <option value="id" selected>Bahasa Indonesia</option>
+                    <option value="en">English</option>
+                    <option value="ar">???????</option>
+                  </select>
+                </div>
+                <div class="sett-field">
+                  <label>Zona Waktu</label>
+                  <select id="zona">
+                    <option value="WIB" selected>WIB (UTC+7)</option>
+                    <option value="WITA">WITA (UTC+8)</option>
+                    <option value="WIT">WIT (UTC+9)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="sett-actions">
+                <button class="btn-sett-primary" onclick="saveAkun()">Simpan Perubahan</button>
+                <button class="btn-sett-outline" onclick="resetAkun()">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sett-card">
+            <div class="sett-card-title">Statistik Akun</div>
+            <div class="sett-stats" id="settStats"></div>
+            <div class="sett-card-title" style="margin-top:20px">Bergabung Sejak</div>
+            <div style="font-size:14px;color:var(--text-light);margin-top:6px" id="settJoinDate">-</div>
+            <div class="sett-card-title" style="margin-top:20px">Hapus Akun</div>
+            <p style="font-size:13px;color:var(--text-light);margin:8px 0 12px;line-height:1.6">
+              Menghapus akun akan menghapus semua data Anda secara permanen dan tidak dapat dipulihkan.
+            </p>
+            <button class="btn-sett-danger" onclick="confirmDeleteAccount()">Hapus Akun Saya</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: NOTIFIKASI -->
+      <div class="sett-content" id="tab-notifikasi">
+        <div class="sett-card" style="max-width:680px">
+          <div class="sett-card-title">Preferensi Notifikasi</div>
+          <p style="font-size:13px;color:var(--text-light);margin-bottom:20px">Pilih jenis notifikasi yang ingin Anda terima.</p>
+
+          <div class="notif-group-label">Aktivitas Belajar</div>
+          <div id="notifToggles"></div>
+
+          <div class="sett-actions" style="margin-top:24px">
+            <button class="btn-sett-primary" onclick="saveNotif()">Simpan Preferensi</button>
+            <button class="btn-sett-outline" onclick="resetNotif()">Reset ke Default</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: PRIVASI -->
+      <div class="sett-content" id="tab-privasi">
+        <div class="sett-card" style="max-width:680px">
+          <div class="sett-card-title">Pengaturan Privasi</div>
+          <p style="font-size:13px;color:var(--text-light);margin-bottom:20px">Kontrol siapa yang dapat melihat informasi Anda.</p>
+          <div id="privasiToggles"></div>
+
+          <div class="sett-card-title" style="margin-top:28px">Data & Privasi</div>
+          <div class="sett-privacy-actions">
+            <div class="sett-privacy-item">
+              <div>
+                <div style="font-size:14px;font-weight:600">Unduh Data Saya</div>
+                <div style="font-size:12px;color:var(--text-light);margin-top:3px">Dapatkan salinan semua data akun Anda</div>
+              </div>
+              <button class="btn-sett-outline" onclick="downloadData()">Unduh</button>
+            </div>
+            <div class="sett-privacy-item">
+              <div>
+                <div style="font-size:14px;font-weight:600">Hapus Riwayat Belajar</div>
+                <div style="font-size:12px;color:var(--text-light);margin-top:3px">Hapus semua riwayat aktivitas belajar Anda</div>
+              </div>
+              <button class="btn-sett-danger" onclick="clearHistory()">Hapus</button>
+            </div>
+          </div>
+
+          <div class="sett-actions" style="margin-top:24px">
+            <button class="btn-sett-primary" onclick="savePrivasi()">Simpan Pengaturan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: KEAMANAN -->
+      <div class="sett-content" id="tab-keamanan">
+        <div class="sett-grid">
+          <div class="sett-card">
+            <div class="sett-card-title">Ubah Password</div>
+            <div class="sett-form">
+              <div class="sett-field">
+                <label>Password Saat Ini</label>
+                <div class="pass-wrap">
+                  <input type="password" id="passLama" placeholder="Masukkan password saat ini">
+                  <button class="pass-eye" onclick="togglePassField('passLama', this)" id="eyeLama"></button>
+                </div>
+              </div>
+              <div class="sett-field">
+                <label>Password Baru</label>
+                <div class="pass-wrap">
+                  <input type="password" id="passBaru" placeholder="Minimal 8 karakter" oninput="checkPassStrength()">
+                  <button class="pass-eye" onclick="togglePassField('passBaru', this)" id="eyeBaru"></button>
+                </div>
+                <div class="pass-strength" id="passStrength" style="display:none">
+                  <div class="pass-strength-bar">
+                    <div class="pass-strength-fill" id="passStrengthFill"></div>
+                  </div>
+                  <span id="passStrengthLabel"></span>
+                </div>
+              </div>
+              <div class="sett-field">
+                <label>Konfirmasi Password Baru</label>
+                <div class="pass-wrap">
+                  <input type="password" id="passKonfirm" placeholder="Ulangi password baru" oninput="checkPassMatch()">
+                  <button class="pass-eye" onclick="togglePassField('passKonfirm', this)" id="eyeKonfirm"></button>
+                </div>
+                <div class="pass-match" id="passMatch" style="display:none"></div>
+              </div>
+              <div class="sett-actions">
+                <button class="btn-sett-primary" onclick="savePassword()">Ubah Password</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="sett-card" style="margin-bottom:16px">
+              <div class="sett-card-title">Autentikasi Dua Faktor (2FA)</div>
+              <p style="font-size:13px;color:var(--text-light);margin:8px 0 16px;line-height:1.6">
+                Tambahkan lapisan keamanan ekstra pada akun Anda dengan verifikasi dua langkah.
+              </p>
+              <div class="sett-2fa-status" id="twoFaStatus">
+                <div class="sett-2fa-badge off" id="twoFaBadge">Nonaktif</div>
+                <button class="btn-sett-primary" id="twoFaBtn" onclick="toggle2FA()">Aktifkan 2FA</button>
+              </div>
+              <div class="sett-2fa-info" id="twoFaInfo" style="display:none">
+                <div style="font-size:13px;color:var(--green);margin-top:12px">
+                  ? 2FA aktif — akun Anda lebih aman
+                </div>
+              </div>
+            </div>
+
+            <div class="sett-card">
+              <div class="sett-card-title">Sesi Aktif</div>
+              <div class="sett-sessions" id="sessionList"></div>
+              <button class="btn-sett-danger" style="margin-top:14px;width:100%" onclick="logoutAll()">
+                Keluar dari Semua Perangkat
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal Konfirmasi -->
+<div class="sett-modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="sett-modal" onclick="event.stopPropagation()">
+    <div class="sett-modal-icon" id="modalIcon"></div>
+    <div class="sett-modal-title" id="modalTitle"></div>
+    <div class="sett-modal-body" id="modalBody"></div>
+    <div class="sett-modal-actions">
+      <button class="btn-sett-outline" onclick="closeModal()">Batal</button>
+      <button class="btn-sett-danger" id="modalConfirmBtn">Konfirmasi</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+</script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script src="pengaturan.js"></script>
+</body>
+</html>

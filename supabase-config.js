@@ -1,0 +1,3 @@
+// Supabase configuration
+const SUPABASE_URL = 'https://tyalkbrukksjlnurnuot.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5YWxrYnJ1a2tzamxudXJudW90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzEzNDEsImV4cCI6MjA5MTE0NzM0MX0.nih_BXioLIaSftyM3zz7pfsEZr929l5U5cGnW-1v_MA';

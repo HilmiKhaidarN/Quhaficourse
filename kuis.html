@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Kuis</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="kuis.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content" id="mainContent">
+      <!-- List view -->
+      <div id="viewList">
+        <div class="page-title">Kuis</div>
+        <div class="page-subtitle">Uji pemahaman Anda dengan kuis</div>
+        <div class="tabs" id="kuisTabs">
+          <button class="tab-btn active" onclick="filterKuis('semua', this)">Semua</button>
+          <button class="tab-btn" onclick="filterKuis('belum', this)">Belum Dikerjakan</button>
+          <button class="tab-btn" onclick="filterKuis('selesai', this)">Selesai</button>
+        </div>
+        <div class="kuis-list" id="kuisList"></div>
+      </div>
+
+      <!-- Quiz view -->
+      <div id="viewQuiz" style="display:none">
+        <div id="quizArea"></div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+</script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script src="kuis.js"></script>
+</body>
+</html>

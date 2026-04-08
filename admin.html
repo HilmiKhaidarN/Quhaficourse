@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-layout { display:flex; min-height:100vh; background:#f5f6fa; }
+    .admin-sidebar { width:220px; background:#1a6b3c; color:#fff; padding:24px 0; flex-shrink:0; }
+    .admin-sidebar .logo { padding:0 20px 24px; border-bottom:1px solid rgba(255,255,255,0.15); margin-bottom:16px; }
+    .admin-sidebar .logo h2 { font-size:16px; font-weight:800; color:#fff; }
+    .admin-sidebar .logo p { font-size:11px; color:rgba(255,255,255,0.6); margin-top:2px; }
+    .admin-nav a { display:flex; align-items:center; gap:10px; padding:10px 20px; color:rgba(255,255,255,0.8); font-size:13px; text-decoration:none; transition:background .15s; cursor:pointer; }
+    .admin-nav a:hover, .admin-nav a.active { background:rgba(255,255,255,0.15); color:#fff; }
+    .admin-nav a svg { width:16px; height:16px; flex-shrink:0; }
+    .admin-main { flex:1; overflow:auto; }
+    .admin-topbar { background:#fff; padding:14px 28px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; }
+    .admin-topbar h1 { font-size:18px; font-weight:700; color:#1a1a2e; }
+    .admin-topbar .user-info { display:flex; align-items:center; gap:10px; font-size:13px; color:#555; }
+    .admin-topbar .avatar { width:32px; height:32px; border-radius:50%; background:#1a6b3c; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; }
+    .admin-content { padding:24px 28px; }
+    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+    .stat-box { background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+    .stat-box .num { font-size:28px; font-weight:800; color:#1a6b3c; }
+    .stat-box .lbl { font-size:12px; color:#888; margin-top:4px; }
+    .admin-card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:20px; overflow:hidden; }
+    .admin-card-header { padding:16px 20px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+    .admin-card-header h3 { font-size:15px; font-weight:700; }
+    .admin-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .admin-table th { background:#f8f9fa; padding:10px 16px; text-align:left; font-weight:600; color:#555; border-bottom:1px solid #eee; }
+    .admin-table td { padding:10px 16px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+    .admin-table tr:last-child td { border-bottom:none; }
+    .btn-sm { padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; border:none; }
+    .btn-danger { background:#fce8e8; color:#c0392b; }
+    .btn-danger:hover { background:#f5c6c6; }
+    .btn-success { background:#e8f5ee; color:#1a6b3c; }
+    .btn-success:hover { background:#c8e6d4; }
+    .btn-warning { background:#fef9e7; color:#c9a227; }
+    .btn-warning:hover { background:#f5e6b0; }
+    .btn-primary { background:#1a6b3c; color:#fff; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; }
+    .btn-primary:hover { background:#0f4a28; }
+    .badge-role { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+    .badge-role.admin { background:#fef9e7; color:#c9a227; }
+    .badge-role.pelajar { background:#e8f5ee; color:#1a6b3c; }
+    .section { display:none; }
+    .section.active { display:block; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:20px; }
+    .form-group label { display:block; font-size:12px; font-weight:600; color:#555; margin-bottom:6px; }
+    .form-group input, .form-group select, .form-group textarea { width:100%; padding:9px 12px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:13px; box-sizing:border-box; }
+    .form-group textarea { resize:vertical; min-height:80px; }
+    .form-footer { padding:0 20px 20px; display:flex; gap:10px; }
+    .empty-admin { text-align:center; padding:40px; color:#aaa; font-size:13px; }
+    .pinned-row { background:#fffbea; }
+    .toast-admin { position:fixed; bottom:24px; right:24px; background:#1a6b3c; color:#fff; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:600; opacity:0; transition:opacity .3s; z-index:9999; pointer-events:none; }
+    .toast-admin.show { opacity:1; }
+    .notif-form { padding:20px; }
+    .notif-form .form-group { margin-bottom:14px; }
+    .user-count { font-size:12px; color:#888; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div class="admin-sidebar">
+    <div class="logo">
+      <h2>QuhafiCourse</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav class="admin-nav">
+      <a onclick="showSection('dashboard')" class="active" id="nav-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a onclick="showSection('diskusi')" id="nav-diskusi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Diskusi
+      </a>
+      <a onclick="showSection('liveclass')" id="nav-liveclass">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Live Class
+      </a>
+      <a onclick="showSection('tugas')" id="nav-tugas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Tugas
+      </a>
+      <a onclick="showSection('notifikasi')" id="nav-notifikasi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notifikasi
+      </a>
+      <a onclick="showSection('users')" id="nav-users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </a>
+      <a href="dashboard.html" style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.15);padding-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Kembali ke App
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="user-info">
+        <div class="avatar">AD</div>
+        <span>Admin</span>
+      </div>
+    </div>
+    <div class="admin-content">
+
+      <!-- DASHBOARD -->
+      <div class="section active" id="section-dashboard">
+        <div class="stats-row" id="statsRow"></div>
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>Diskusi Terbaru</h3></div>
+          <div id="recentThreadsAdmin"></div>
+        </div>
+      </div>
+
+      <!-- DISKUSI -->
+      <div class="section" id="section-diskusi">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Semua Thread Diskusi</h3>
+            <span id="threadCount" class="user-count"></span>
+          </div>
+          <table class="admin-table">
+            <thead><tr><th>Judul</th><th>Kategori</th><th>Author</th><th>Balasan</th><th>Likes</th><th>Aksi</th></tr></thead>
+            <tbody id="threadTableBody"></tbody>
+          </table>
+        </div>
+        <div class="admin-card" style="margin-top:20px">
+          <div class="admin-card-header"><h3>Laporan Konten</h3><span id="reportCount" class="user-count"></span></div>
+          <table class="admin-table">
+            <thead><tr><th>Tipe</th><th>Konten</th><th>Pelapor</th><th>Waktu</th><th>Aksi</th></tr></thead>
+            <tbody id="reportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LIVE CLASS -->
+      <div class="section" id="section-liveclass">
+        <div class="admin-card" style="margin-bottom:20px">
+          <div class="admin-card-header"><h3>Tambah Jadwal Live Class</h3></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Judul</label><input type="text" id="lc-title" placeholder="Judul live class..."></div>
+            <div class="form-group"><label>Pengajar · Mata Pelajaran</label><input type="text" id="lc-meta" placeholder="Afifah Adawiyyah · Fikih"></div>
+            <div class="form-group"><label>Waktu</label><input type="text" id="lc-time" placeholder="Senin, 20.00 - 21.00 WIB"></div>
+            <div class="form-group"><label>Status</label>
+              <select id="lc-status">
+                <option value="mendatang">Mendatang</option>
+                <option value="live">Sedang Live</option>
+                <option value="selesai">Selesai</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Link Gabung (opsional)</label><input type="text" id="lc-url" placeholder="https://meet.google.com/..."></div>
+            <div class="form-group"><label>Warna Icon</label>
+              <select id="lc-color">
+                <option value="#e8f5ee|#1a6b3c|scale">Fikih (Hijau)</option>
+                <option value="#e8f5ee|#1a6b3c|moon">Akidah (Hijau)</option>
+                <option value="#fef9e7|#c9a227|heart">Akhlak (Emas)</option>
+                <option value="#e8f5ee|#1a6b3c|book">Qurdis (Hijau)</option>
+                <option value="#fef9e7|#c9a227|landmark">Sejarah (Emas)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-footer"><button class="btn-primary" onclick="addLiveClass()">Tambah Jadwal</button></div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>Daftar Live Class</h3></div>
+          <table class="admin-table">
+            <thead><tr><th>Judul</th><th>Pengajar</th><th>Waktu</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody id="liveTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TUGAS -->
+      <div class="section" id="section-tugas">
+        <div class="admin-card" style="margin-bottom:20px">
+          <div class="admin-card-header"><h3>Tambah Tugas</h3></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Judul Tugas</label><input type="text" id="tg-title" placeholder="Makalah Hukum Air..."></div>
+            <div class="form-group"><label>Mata Pelajaran · Jenis</label><input type="text" id="tg-meta" placeholder="Fikih · Tugas Tertulis"></div>
+            <div class="form-group"><label>Deadline</label><input type="date" id="tg-deadline"></div>
+            <div class="form-group"><label>Warna</label>
+              <select id="tg-color">
+                <option value="#e8f5ee|#1a6b3c|scale">Fikih (Hijau)</option>
+                <option value="#e8f5ee|#1a6b3c|moon">Akidah (Hijau)</option>
+                <option value="#fef9e7|#c9a227|heart">Akhlak (Emas)</option>
+                <option value="#e8f5ee|#1a6b3c|book">Qurdis (Hijau)</option>
+                <option value="#fef9e7|#c9a227|landmark">Sejarah (Emas)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-footer"><button class="btn-primary" onclick="addTugas()">Tambah Tugas</button></div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>Daftar Tugas</h3></div>
+          <table class="admin-table">
+            <thead><tr><th>Judul</th><th>Mata Pelajaran</th><th>Deadline</th><th>Aksi</th></tr></thead>
+            <tbody id="tugasTableBody"></tbody>
+          </table>
+        </div>
+        <div class="admin-card" style="margin-top:20px">
+          <div class="admin-card-header"><h3>Pengumpulan Tugas</h3></div>
+          <table class="admin-table">
+            <thead><tr><th>Tugas</th><th>Pengumpul</th><th>Tgl Kumpul</th><th>Catatan</th><th>Link</th><th>Nilai</th></tr></thead>
+            <tbody id="pengumpulanBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- NOTIFIKASI -->
+      <div class="section" id="section-notifikasi">
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>Kirim Notifikasi ke Semua User</h3></div>
+          <div class="notif-form">
+            <div class="form-group"><label>Ikon</label>
+              <select id="notif-icon">
+                <option value="📢">📢 Pengumuman</option>
+                <option value="🎥">🎥 Live Class</option>
+                <option value="📝">📝 Kuis</option>
+                <option value="📋">📋 Tugas</option>
+                <option value="🏆">🏆 Sertifikat</option>
+                <option value="💬">💬 Diskusi</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Judul Notifikasi</label><input type="text" id="notif-title" placeholder="Judul notifikasi..."></div>
+            <div class="form-group"><label>Isi Pesan</label><textarea id="notif-body" placeholder="Isi pesan notifikasi..."></textarea></div>
+            <div class="form-group"><label>Link Tujuan</label>
+              <select id="notif-href">
+                <option value="dashboard.html">Dashboard</option>
+                <option value="live-class.html">Live Class</option>
+                <option value="kuis.html">Kuis</option>
+                <option value="tugas.html">Tugas</option>
+                <option value="diskusi.html">Diskusi</option>
+                <option value="sertifikat.html">Sertifikat</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="sendNotif()">Kirim Notifikasi</button>
+          </div>
+          <div class="admin-card-header" style="border-top:1px solid #f0f0f0"><h3>Riwayat Notifikasi</h3></div>
+          <div id="notifHistory"></div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="section" id="section-users">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Daftar User</h3>
+            <span id="userCount" class="user-count"></span>
+          </div>
+          <table class="admin-table">
+            <thead><tr><th>Nama</th><th>Username</th><th>Email</th><th>Role</th><th>Bergabung</th><th>Aksi</th></tr></thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-admin" id="adminToast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+
+<script>
+// Guard: hanya admin yang boleh akses (async)
+(async () => {
+  if (_supabase) {
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+    if (!_currentUserCache) await _fetchAndCacheProfile(session.user.id, session.user.email);
+    if (_currentUserCache?.role !== 'Admin') { window.location.href = 'dashboard.html'; return; }
+  }
+})();
+
+// ============================================================
+// NAVIGASI
+// ============================================================
+const TITLES = { dashboard:'Dashboard', diskusi:'Moderasi Diskusi', liveclass:'Live Class', tugas:'Tugas', notifikasi:'Notifikasi', users:'Manajemen User' };
+
+function showSection(key) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.admin-nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('section-' + key).classList.add('active');
+  document.getElementById('nav-' + key).classList.add('active');
+  document.getElementById('pageTitle').textContent = TITLES[key];
+  if (key === 'dashboard') renderDashboard();
+  if (key === 'diskusi') renderDiskusi();
+  if (key === 'liveclass') renderLiveClass();
+  if (key === 'tugas') renderTugas();
+  if (key === 'notifikasi') renderNotifHistory();
+  if (key === 'users') renderUsers();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function renderDashboard() {
+  const { data: threads } = await _supabase.from('discussion_threads').select('id');
+  const { data: profiles } = await _supabase.from('profiles').select('id');
+  const { data: lives } = await _supabase.from('live_classes').select('id');
+  const { data: tasks } = await _supabase.from('tasks').select('id');
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-box"><div class="num">${(threads||[]).length}</div><div class="lbl">Total Diskusi</div></div>
+    <div class="stat-box"><div class="num">${(profiles||[]).length}</div><div class="lbl">Total User</div></div>
+    <div class="stat-box"><div class="num">${(lives||[]).length}</div><div class="lbl">Live Class</div></div>
+    <div class="stat-box"><div class="num">${(tasks||[]).length}</div><div class="lbl">Total Tugas</div></div>`;
+
+  const { data: recentThreads } = await _supabase.from('discussion_threads').select('title,kategori,author_name').order('created_at', { ascending: false }).limit(5);
+  document.getElementById('recentThreadsAdmin').innerHTML = !recentThreads?.length
+    ? '<div class="empty-admin">Belum ada diskusi</div>'
+    : '<table class="admin-table"><thead><tr><th>Judul</th><th>Kategori</th><th>Author</th></tr></thead><tbody>'
+      + recentThreads.map(t => '<tr><td>' + t.title + '</td><td>' + t.kategori + '</td><td>' + t.author_name + '</td></tr>').join('')
+      + '</tbody></table>';
+}
+
+// ============================================================
+// DISKUSI
+// ============================================================
+async function renderDiskusi() {
+  const { data: threads } = await _supabase.from('discussion_threads').select('id,title,kategori,author_name,is_pinned,created_at').order('created_at', { ascending: false });
+  document.getElementById('threadCount').textContent = (threads?.length || 0) + ' thread';
+  document.getElementById('threadTableBody').innerHTML = !threads?.length
+    ? '<tr><td colspan="6"><div class="empty-admin">Belum ada diskusi</div></td></tr>'
+    : threads.map(t => `
+      <tr class="${t.is_pinned ? 'pinned-row' : ''}">
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.is_pinned ? '📌 ' : ''}${t.title}</td>
+        <td>${t.kategori}</td>
+        <td>${t.author_name}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-sm btn-warning" onclick="togglePin('${t.id}','${t.is_pinned}')">${t.is_pinned ? 'Unpin' : 'Pin'}</button>
+          <button class="btn-sm btn-danger" onclick="deleteThread('${t.id}')">Hapus</button>
+        </td>
+      </tr>`).join('');
+
+  // Laporan (tetap localStorage)
+  const reports = JSON.parse(localStorage.getItem('diskusi_reports') || '[]');
+  document.getElementById('reportCount').textContent = reports.filter(r => r.status === 'pending').length + ' pending';
+  document.getElementById('reportTableBody').innerHTML = !reports.length
+    ? '<tr><td colspan="5"><div class="empty-admin">Tidak ada laporan</div></td></tr>'
+    : reports.map((r, i) => `
+      <tr>
+        <td><span style="font-size:11px;padding:2px 8px;border-radius:20px;background:${r.type==='thread'?'#e8f4fd':'#fef9e7'};color:${r.type==='thread'?'#2980b9':'#c9a227'};font-weight:600">${r.type}</span></td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.targetTitle}</td>
+        <td>${r.reporter}</td>
+        <td style="font-size:12px;color:#888">${r.time}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-sm btn-danger" onclick="resolveReport(${i}, true)">Hapus Konten</button>
+          <button class="btn-sm btn-success" onclick="resolveReport(${i}, false)">Abaikan</button>
+        </td>
+      </tr>`).join('');
+}
+
+async function togglePin(id, currentPinned) {
+  const newPinned = currentPinned === 'true' || currentPinned === true ? false : true;
+  await _supabase.from('discussion_threads').update({ is_pinned: newPinned }).eq('id', id);
+  renderDiskusi();
+  toast(newPinned ? 'Thread di-pin' : 'Thread di-unpin');
+}
+
+async function deleteThread(id) {
+  if (!confirm('Hapus thread ini?')) return;
+  await _supabase.from('discussion_threads').delete().eq('id', id);
+  renderDiskusi();
+  toast('Thread dihapus');
+}
+
+function resolveReport(i, deleteContent) {
+  const reports = JSON.parse(localStorage.getItem('diskusi_reports') || '[]');
+  const r = reports[i];
+  if (deleteContent && r.type === 'thread') {
+    _supabase.from('discussion_threads').delete().eq('id', r.targetId);
+  } else if (deleteContent && r.type === 'reply') {
+    _supabase.from('discussion_replies').delete().eq('id', r.targetId);
+  }
+  reports.splice(i, 1);
+  localStorage.setItem('diskusi_reports', JSON.stringify(reports));
+  renderDiskusi();
+  toast(deleteContent ? 'Konten dihapus' : 'Laporan diabaikan');
+}
+
+// ============================================================
+// LIVE CLASS
+// ============================================================
+async function renderLiveClass() {
+  const { data: lives, error } = await _supabase.from('live_classes').select('*').order('created_at', { ascending: false });
+  if (error) { toast('Gagal memuat live class', true); return; }
+  const statusLabel = { live:'🔴 Live', mendatang:'🕐 Mendatang', selesai:'✅ Selesai' };
+  document.getElementById('liveTableBody').innerHTML = !lives?.length
+    ? '<tr><td colspan="5"><div class="empty-admin">Belum ada jadwal</div></td></tr>'
+    : lives.map(l => `
+      <tr>
+        <td>${l.title}</td>
+        <td>${l.meta || ''}</td>
+        <td>${l.time || ''}</td>
+        <td>${statusLabel[l.status] || l.status}</td>
+        <td><button class="btn-sm btn-danger" onclick="deleteLive('${l.id}')">Hapus</button></td>
+      </tr>`).join('');
+}
+
+async function addLiveClass() {
+  const title = document.getElementById('lc-title').value.trim();
+  const meta = document.getElementById('lc-meta').value.trim();
+  const time = document.getElementById('lc-time').value.trim();
+  const status = document.getElementById('lc-status').value;
+  const url = document.getElementById('lc-url').value.trim();
+  if (!title || !meta || !time) { toast('Judul, pengajar, dan waktu wajib diisi', true); return; }
+  const { error } = await _supabase.from('live_classes').insert({ title, meta, time, status, url: url || null });
+  if (error) { toast('Gagal menambahkan jadwal', true); return; }
+  ['lc-title','lc-meta','lc-time','lc-url'].forEach(id => document.getElementById(id).value = '');
+  renderLiveClass();
+  toast('Jadwal live class ditambahkan');
+}
+
+async function deleteLive(id) {
+  if (!confirm('Hapus jadwal ini?')) return;
+  await _supabase.from('live_classes').delete().eq('id', id);
+  renderLiveClass();
+  toast('Jadwal dihapus');
+}
+
+// ============================================================
+// TUGAS
+// ============================================================
+async function renderTugas() {
+  const { data: tasks, error } = await _supabase.from('tasks').select('*').order('created_at', { ascending: false });
+  if (error) { toast('Gagal memuat tugas', true); return; }
+
+  document.getElementById('tugasTableBody').innerHTML = !tasks?.length
+    ? '<tr><td colspan="4"><div class="empty-admin">Belum ada tugas</div></td></tr>'
+    : tasks.map(t => `
+      <tr>
+        <td>${t.title}</td>
+        <td>${t.subject}</td>
+        <td>${t.deadline}</td>
+        <td><button class="btn-sm btn-danger" onclick="deleteTugas('${t.id}')">Hapus</button></td>
+      </tr>`).join('');
+
+  // Pengumpulan
+  const { data: subs } = await _supabase.from('task_submissions').select('*, tasks(title)').order('submitted_at', { ascending: false });
+  document.getElementById('pengumpulanBody').innerHTML = !subs?.length
+    ? '<tr><td colspan="6"><div class="empty-admin">Belum ada pengumpulan</div></td></tr>'
+    : subs.map(s => `
+      <tr>
+        <td>${s.tasks?.title || '-'}</td>
+        <td>${s.user_name}</td>
+        <td>${new Date(s.submitted_at).toLocaleDateString('id-ID')}</td>
+        <td>${s.notes ? '<span title="' + s.notes + '" style="cursor:help">📝 ' + s.notes.substring(0,30) + (s.notes.length>30?'...':'') + '</span>' : '-'}</td>
+        <td>${s.link ? '<a href="' + s.link + '" target="_blank" style="color:#2980b9">🔗 Lihat</a>' : '-'}</td>
+        <td>
+          ${s.grade != null
+            ? '<span style="color:#2980b9;font-weight:700">' + s.grade + '/100</span>'
+            : '<div style="display:flex;gap:6px;align-items:center"><input type="number" min="0" max="100" placeholder="0-100" id="nilai_' + s.id + '" style="width:70px;padding:4px 8px;border:1.5px solid #ddd;border-radius:6px;font-size:12px"><button class="btn-sm btn-success" onclick="beriNilai(\'' + s.id + '\')">Nilai</button></div>'
+          }
+        </td>
+      </tr>`).join('');
+}
+
+async function addTugas() {
+  const title = document.getElementById('tg-title').value.trim();
+  const subject = document.getElementById('tg-meta').value.trim();
+  const deadlineRaw = document.getElementById('tg-deadline').value;
+  const description = document.getElementById('tg-desc')?.value.trim() || '';
+  if (!title || !subject || !deadlineRaw) { toast('Semua field wajib diisi', true); return; }
+  const deadline = new Date(deadlineRaw).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  const { error } = await _supabase.from('tasks').insert({ title, subject, deadline, description: description || null });
+  if (error) { toast('Gagal menambahkan tugas', true); return; }
+  ['tg-title','tg-meta','tg-deadline'].forEach(id => document.getElementById(id).value = '');
+  renderTugas();
+  toast('Tugas ditambahkan');
+}
+
+async function deleteTugas(id) {
+  if (!confirm('Hapus tugas ini?')) return;
+  await _supabase.from('tasks').delete().eq('id', id);
+  renderTugas();
+  toast('Tugas dihapus');
+}
+
+async function beriNilai(subId) {
+  const val = document.getElementById('nilai_' + subId)?.value;
+  if (!val || val < 0 || val > 100) { toast('Masukkan nilai 0-100', true); return; }
+  const { error } = await _supabase.from('task_submissions').update({ grade: parseInt(val) }).eq('id', subId);
+  if (error) { toast('Gagal menyimpan nilai', true); return; }
+  renderTugas();
+  toast('Nilai berhasil disimpan');
+}
+
+// ============================================================
+// NOTIFIKASI
+// ============================================================
+async function sendNotif() {
+  const icon = document.getElementById('notif-icon').value;
+  const title = document.getElementById('notif-title').value.trim();
+  const body = document.getElementById('notif-body').value.trim();
+  const href = document.getElementById('notif-href').value;
+  if (!title || !body) { toast('Judul dan isi pesan wajib diisi', true); return; }
+  const { error } = await _supabase.from('notifications').insert({ icon, title, body, href });
+  if (error) { toast('Gagal mengirim notifikasi', true); return; }
+  document.getElementById('notif-title').value = '';
+  document.getElementById('notif-body').value = '';
+  renderNotifHistory();
+  toast('Notifikasi dikirim ke semua user');
+}
+
+async function renderNotifHistory() {
+  const { data: notifs } = await _supabase.from('notifications').select('*').order('created_at', { ascending: false });
+  document.getElementById('notifHistory').innerHTML = !notifs?.length
+    ? '<div class="empty-admin">Belum ada notifikasi</div>'
+    : '<table class="admin-table"><thead><tr><th>Ikon</th><th>Judul</th><th>Pesan</th><th>Aksi</th></tr></thead><tbody>'
+      + notifs.map(n => '<tr><td>' + n.icon + '</td><td>' + n.title + '</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + n.body + '</td><td><button class="btn-sm btn-danger" onclick="deleteNotif(\'' + n.id + '\')">Hapus</button></td></tr>').join('')
+      + '</tbody></table>';
+}
+
+async function deleteNotif(id) {
+  await _supabase.from('notifications').delete().eq('id', id);
+  renderNotifHistory();
+  toast('Notifikasi dihapus');
+}
+
+// ============================================================
+// USERS
+// ============================================================
+async function renderUsers() {
+  const { data: users } = await _supabase.from('profiles').select('*').order('join_date', { ascending: false });
+  document.getElementById('userCount').textContent = (users?.length || 0) + ' user';
+  document.getElementById('userTableBody').innerHTML = !users?.length
+    ? '<tr><td colspan="6"><div class="empty-admin">Belum ada user</div></td></tr>'
+    : users.map(u => `
+      <tr>
+        <td>${u.nama}</td>
+        <td>${u.username}</td>
+        <td>${u.email || '-'}</td>
+        <td><span class="badge-role ${u.role === 'Admin' ? 'admin' : 'pelajar'}">${u.role}</span></td>
+        <td>${u.join_date || '-'}</td>
+        <td>${u.role !== 'Admin' ? `<button class="btn-sm btn-danger" onclick="deleteUser('${u.id}')">Hapus</button>` : '-'}</td>
+      </tr>`).join('');
+}
+
+async function deleteUser(id) {
+  if (!confirm('Hapus user ini?')) return;
+  await _supabase.from('profiles').delete().eq('id', id);
+  renderUsers();
+  toast('User dihapus');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, isError = false) {
+  const t = document.getElementById('adminToast');
+  t.textContent = (isError ? '❌ ' : '✅ ') + msg;
+  t.style.background = isError ? '#c0392b' : '#1a6b3c';
+  t.className = 'toast-admin show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Init
+renderDashboard();
+</script>
+</body>
+</html>

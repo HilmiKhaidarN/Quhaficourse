@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Profil</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+      <div class="page-title">Profile Saya</div>
+      <div class="page-subtitle">Kelola informasi profil Anda</div>
+
+      <div class="profil-layout">
+        <div>
+          <div class="profil-card">
+            <div class="profil-avatar" id="profilAvatar"></div>
+            <h3 id="profilNama">�</h3>
+            <div class="profil-role" id="profilRole">Pelajar</div>
+            <div class="profil-stats">
+              <div class="profil-stat"><div class="ps-num">12</div><div class="ps-label">Kelas Diikuti</div></div>
+              <div class="profil-stat"><div class="ps-num">24</div><div class="ps-label">Materi Selesai</div></div>
+              <div class="profil-stat"><div class="ps-num">85%</div><div class="ps-label">Progress</div></div>
+              <div class="profil-stat"><div class="ps-num">5</div><div class="ps-label">Sertifikat</div></div>
+            </div>
+            <button class="btn-edit-profil" onclick="window.location.href='pengaturan.html'">Edit Profil</button>
+          </div>
+          <div class="profil-info-card" style="margin-top:16px">
+            <h3>Tentang Saya</h3>
+            <p style="font-size:13px;color:var(--text-light);line-height:1.6">
+              Seorang pelajar yang bersemangat untuk memperdalam ilmu agama Islam. Bergabung dengan QuhafCourse untuk meningkatkan pemahaman tentang Al-Qur'an, Hadis, Fikih, dan Akhlak.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="profil-info-card">
+            <h3>Informasi Akun</h3>
+            <div class="info-row">
+              <span class="ir-icon" id="ir1"></span>
+              <span class="ir-label">Nama Lengkap</span>
+              <span class="ir-value" id="infoNama">�</span>
+            </div>
+            <div class="info-row">
+              <span class="ir-icon" id="ir2"></span>
+              <span class="ir-label">Email</span>
+              <span class="ir-value" id="infoEmail">�</span>
+            </div>
+            <div class="info-row">
+              <span class="ir-icon" id="ir3"></span>
+              <span class="ir-label">Username</span>
+              <span class="ir-value" id="infoUsername">�</span>
+            </div>
+            <div class="info-row">
+              <span class="ir-icon" id="ir4"></span>
+              <span class="ir-label">Bergabung</span>
+              <span class="ir-value" id="infoJoin">�</span>
+            </div>
+          </div>
+
+          <div class="profil-info-card">
+            <h3>Histori Belajar</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap" id="historiList"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+</script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script>
+initLayout('profil');
+document.getElementById('profilAvatar').innerHTML = IC.userCircle;
+document.getElementById('ir1').innerHTML = IC.user;
+document.getElementById('ir2').innerHTML = IC.mail;
+document.getElementById('ir3').innerHTML = IC.tag;
+document.getElementById('ir4').innerHTML = IC.mapPin;
+
+(async () => {
+  if (_supabase) {
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session && !_currentUserCache) await _fetchAndCacheProfile(session.user.id, session.user.email);
+  }
+  const _u = getCurrentUser();
+  if (_u) {
+    document.getElementById('profilNama').textContent = _u.nama;
+    document.getElementById('profilRole').textContent = _u.role || 'Pelajar';
+    document.getElementById('infoNama').textContent = _u.nama;
+    document.getElementById('infoEmail').textContent = _u.email;
+    document.getElementById('infoUsername').textContent = '@' + _u.username;
+    document.getElementById('infoJoin').textContent = _u.joinDate || '-';
+    const savedAvatar = _u.avatar || localStorage.getItem('sett_avatar');
+    if (savedAvatar) document.getElementById('profilAvatar').innerHTML = '<img src="' + savedAvatar + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    await loadAllProgress();
+    const keys = ['fikih','akidah','akhlak','qurdis','sejarah'];
+    const kelasAktif = keys.filter(k => parseInt(localStorage.getItem('progress_' + k) || '0') > 0).length;
+    const selesai = keys.filter(k => parseInt(localStorage.getItem('progress_' + k) || '0') >= 100).length;
+    const totalPct = Math.round(keys.reduce((s,k) => s + parseInt(localStorage.getItem('progress_' + k) || '0'), 0) / keys.length);
+    document.querySelector('.profil-stats').innerHTML =
+      '<div class="profil-stat"><div class="ps-num">' + kelasAktif + '</div><div class="ps-label">Kelas Diikuti</div></div>' +
+      '<div class="profil-stat"><div class="ps-num">' + selesai + '</div><div class="ps-label">Kursus Selesai</div></div>' +
+      '<div class="profil-stat"><div class="ps-num">' + totalPct + '%</div><div class="ps-label">Progress</div></div>' +
+      '<div class="profil-stat"><div class="ps-num">' + selesai + '</div><div class="ps-label">Sertifikat</div></div>';
+  }
+  const hist = [
+    { icon: IC.scale, label: 'Fikih', key: 'fikih' },
+    { icon: IC.moon, label: 'Akidah', key: 'akidah' },
+    { icon: IC.heart, label: 'Akhlak', key: 'akhlak' },
+    { icon: IC.book, label: 'Qurdis', key: 'qurdis' },
+    { icon: IC.landmark, label: 'Sejarah', key: 'sejarah' },
+  ];
+  document.getElementById('historiList').innerHTML = hist.map(function(h) {
+    const pct = parseInt(localStorage.getItem('progress_' + h.key) || '0');
+    const color = pct >= 100 ? 'var(--green)' : pct > 0 ? '#e67e22' : '#aaa';
+    const bg = pct >= 100 ? 'var(--green-light)' : pct > 0 ? '#fef9e7' : '#f5f5f5';
+    return '<div style="background:' + bg + ';padding:8px 14px;border-radius:20px;font-size:13px;color:' + color + ';font-weight:600;display:flex;align-items:center;gap:6px">' + h.icon + ' ' + h.label + (pct > 0 ? ' (' + pct + '%)' : '') + '</div>';
+  }).join('');
+})();
+</script>
+</body>
+</html>

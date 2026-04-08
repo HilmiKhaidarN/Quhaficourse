@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="logo/logoQuhafiCourse.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuhafiCourse - Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-content">
+
+      <div class="welcome-section">
+        <div>
+          <h2 style="font-size:15px;color:var(--text-light);font-weight:400" id="welcomeGreet">Assalamu'alaikum</h2>
+          <h2 style="font-size:26px;margin-top:4px">Selamat datang kembali!</h2>
+          <p>Teruslah belajar dan tingkatkan ilmu agama Anda setiap hari.</p>
+        </div>
+        <div class="hadith-box">
+          "Barang siapa yang menempuh jalan untuk mencari ilmu, maka Allah akan mudahkan baginya jalan menuju surga."
+          <span>(HR. Muslim)</span>
+        </div>
+      </div>
+
+      <!-- Course Cards -->
+      <div class="course-grid" id="courseGrid"></div>
+
+      <!-- Bottom Section -->
+      <div class="dashboard-bottom">
+        <div>
+          <div class="section-header">
+            <h3>Lanjutkan Belajar</h3>
+            <a href="kelas.html">Lihat Semua</a>
+          </div>
+          <div id="continueList"></div>
+        </div>
+
+        <div>
+          <div class="stats-card">
+            <div class="section-header"><h3>Statistik Belajar</h3></div>
+            <div class="stats-grid" id="statsGrid"></div>
+          </div>
+
+          <div class="stats-card">
+            <div class="section-header"><h3>Achievement</h3></div>
+            <div class="achievement-grid" id="achievementGrid"></div>
+          </div>
+
+          <div class="stats-card">
+            <div class="section-header"><h3>Jadwal Live Class</h3><a href="live-class.html">Lihat Semua</a></div>
+            <div id="dashLiveClass"></div>
+          </div>
+
+          <div class="stats-card">
+            <div class="section-header"><h3>Diskusi Terbaru</h3><a href="diskusi.html">Lihat Semua</a></div>
+            <div id="recentDiskusi"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+</script>
+<script src="supabase-config.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+<script>
+(async () => {
+await initLayout('dashboard');
+
+// Set welcome name from logged-in user
+const _user = getCurrentUser();
+if (_user) {
+  const firstName = _user.nama.split(' ')[0];
+  document.getElementById('welcomeGreet').textContent = `Assalamu'alaikum, ${firstName}`;
+}
+
+const KURSUS = [
+  { key:'fikih',   icon: IC.scale,    bg: '#e8f5ee', color: '#1a6b3c', title: 'Fikih',                    desc: 'Pelajari hukum-hukum Islam yang mengatur kehidupan sehari-hari.', mat: 12, fill: '',       href: 'belajar-thaharah.html' },
+  { key:'akidah',  icon: IC.moon,     bg: '#e8f5ee', color: '#1a6b3c', title: 'Akidah',                   desc: 'Memahami rukun iman dan dasar-dasar keyakinan Islam.',             mat: 8,  fill: '',       href: 'belajar-akidah.html' },
+  { key:'akhlak',  icon: IC.heart,    bg: '#fef9e7', color: '#c9a227', title: 'Akhlak',                   desc: 'Membangun karakter mulia sesuai ajaran Islam.',                    mat: 10, fill: 'gold',   href: 'belajar-akhlak.html' },
+  { key:'qurdis',  icon: IC.book,     bg: '#e8f5ee', color: '#1a6b3c', title: 'Quran Hadits',             desc: 'Kajian mendalam tentang Al-Qur\'an dan ilmu-ilmunya.',             mat: 15, fill: '',       href: 'belajar-qurdis.html' },
+  { key:'sejarah', icon: IC.landmark, bg: '#fef9e7', color: '#c9a227', title: 'Sejarah Kebudayaan Islam', desc: 'Mempelajari sejarah dan peradaban Islam yang agung.',              mat: 7,  fill: 'orange', href: 'belajar-sejarah.html' },
+];
+
+document.getElementById('courseGrid').innerHTML = KURSUS.map(c => {
+  const pct = parseInt(localStorage.getItem('progress_' + c.key) || '0', 10);
+  return `
+  <div class="course-card" onclick="window.location.href='${c.href}'" style="cursor:pointer">
+    <div class="course-icon" style="background:${c.bg};color:${c.color}">${c.icon}</div>
+    <h4>${c.title}</h4>
+    <p>${c.desc}</p>
+    <div class="progress-bar"><div class="progress-fill ${c.fill}" style="width:${pct}%"></div></div>
+    <div class="course-meta"><span>${pct}%</span><span>${c.mat} Materi</span></div>
+  </div>`;
+}).join('');
+
+// Lanjutkan Belajar � hanya tampil kursus yang sudah dimulai (progress > 0)
+const CONT_LABELS = { fikih:'Fikih: Thaharah', akidah:'Akidah: Rukun Iman', akhlak:'Akhlak: Pengertian Akhlak', qurdis:'Quran Hadits: Al-Qur\'an', sejarah:'Sejarah: Pra-Islam' };
+const started = KURSUS.filter(c => parseInt(localStorage.getItem('progress_' + c.key) || '0', 10) > 0);
+const continueEl = document.getElementById('continueList');
+if (started.length === 0) {
+  continueEl.innerHTML = `<p style="font-size:13px;color:var(--text-light);padding:12px 0">Belum ada kursus yang dimulai. <a href="materi.html">Mulai belajar</a></p>`;
+} else {
+  continueEl.innerHTML = started.map(c => {
+    const pct = parseInt(localStorage.getItem('progress_' + c.key) || '0', 10);
+    return `
+    <div class="continue-card">
+      <div class="cc-icon" style="background:${c.bg};color:${c.color}">${c.icon}</div>
+      <div class="cc-info">
+        <h4>${CONT_LABELS[c.key]}</h4>
+        <p>Lanjutkan dari progress terakhir</p>
+        <div class="progress-bar"><div class="progress-fill ${c.fill}" style="width:${pct}%"></div></div>
+      </div>
+      <span class="cc-pct">${pct}%</span>
+      <button class="btn-lanjut" onclick="window.location.href='${c.href}'">Lanjutkan</button>
+    </div>`;
+  }).join('');
+}
+
+// Statistik dinamis
+const keys = ['fikih','akidah','akhlak','qurdis','sejarah'];
+const kelasAktif = keys.filter(k => parseInt(localStorage.getItem('progress_' + k) || '0') > 0).length;
+const selesai = keys.filter(k => parseInt(localStorage.getItem('progress_' + k) || '0') >= 100).length;
+const totalPct = Math.round(keys.reduce((s,k) => s + parseInt(localStorage.getItem('progress_' + k) || '0'), 0) / keys.length);
+document.getElementById('statsGrid').innerHTML = `
+  <div class="stat-item"><div class="stat-num">${kelasAktif}</div><div class="stat-label">Kelas Diikuti</div></div>
+  <div class="stat-item"><div class="stat-num">${selesai}</div><div class="stat-label">Kursus Selesai</div></div>
+  <div class="stat-item"><div class="stat-num">${totalPct}%</div><div class="stat-label">Progress Total</div></div>`;
+
+// Achievement dinamis
+const pelajarAktif = kelasAktif >= 1;
+const quizMaster = keys.some(k => parseInt(localStorage.getItem('score_' + k) || '0') >= 80);
+const consistency = selesai >= 1;
+
+const ACHIEVEMENTS = [
+  { icon: IC.trophy, label: 'Pelajar Aktif',  desc: 'Mulai 1 kursus',          unlocked: pelajarAktif, bg: '#fef9e7', color: 'var(--gold)' },
+  { icon: IC.award,  label: 'Quiz Master',    desc: 'Nilai kuis = 80',          unlocked: quizMaster,   bg: '#e8f5ee', color: 'var(--green)' },
+  { icon: IC.star,   label: 'Consistency',    desc: 'Selesaikan 1 kursus',      unlocked: consistency,  bg: '#e8f4fd', color: '#2980b9' },
+];
+document.getElementById('achievementGrid').innerHTML = ACHIEVEMENTS.map(a => `
+  <div class="badge" title="${a.unlocked ? 'Terbuka' : 'Belum terbuka: ' + a.desc}">
+    <div class="badge-icon" style="background:${a.unlocked ? a.bg : '#f0f0f0'};color:${a.unlocked ? a.color : '#ccc'};position:relative">
+      ${a.icon}
+      ${!a.unlocked ? '<span style="position:absolute;bottom:2px;right:2px;font-size:10px">??</span>' : ''}
+    </div>
+    <p style="color:${a.unlocked ? 'var(--text)' : '#bbb'}">${a.label}</p>
+    <p style="font-size:10px;color:#aaa;margin-top:-4px">${a.desc}</p>
+  </div>`).join('');
+
+// Live class dan Diskusi terbaru dari Supabase
+(async () => {
+  const dashLive = document.getElementById('dashLiveClass');
+  const { data: lives } = await _supabase.from('live_classes')
+    .select('*').in('status', ['live', 'mendatang']).order('created_at', { ascending: false }).limit(2);
+  if (!lives || !lives.length) {
+    dashLive.innerHTML = '<p style="font-size:13px;color:var(--text-light);padding:12px 0">Belum ada jadwal live class.</p>';
+  } else {
+    dashLive.innerHTML = lives.map(function(l) {
+      return '<div class="live-item"><div style="display:flex;align-items:center;gap:8px">'
+        + (l.status === 'live' ? '<span class="live-badge">LIVE</span>' : '')
+        + '<div class="li-info"><h4>' + l.title + '</h4><p>' + (l.meta||'') + ' - ' + (l.time||'') + '</p></div></div>'
+        + (l.status === 'live' ? '<button class="btn-gabung" onclick="window.open(\'' + (l.url||'#') + '\',\'_blank\')">Gabung</button>' : '')
+        + '</div>';
+    }).join('');
+  }
+
+  const recentDiskusiEl = document.getElementById('recentDiskusi');
+  const { data: threads } = await _supabase.from('discussion_threads')
+    .select('id,title,author_name,created_at').order('created_at', { ascending: false }).limit(3);
+  if (!threads || !threads.length) {
+    recentDiskusiEl.innerHTML = '<p style="font-size:13px;color:var(--text-light);padding:12px 0">Belum ada diskusi. <a href="diskusi.html">Mulai diskusi</a></p>';
+  } else {
+    recentDiskusiEl.innerHTML = threads.map(function(t) {
+      return '<div class="diskusi-item" onclick="window.location.href=\'diskusi.html\'" style="cursor:pointer">'
+        + '<div class="di-info"><h4>' + t.title + '</h4><p>' + t.author_name + '</p></div>'
+        + '</div>';
+    }).join('');
+  }
+})();
+</script>
+</body>
+</html>
