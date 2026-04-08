@@ -57,13 +57,21 @@ function closeModal() {
 // ============================================================
 // TAB AKUN
 // ============================================================
-const AKUN_DEFAULT = { nama: 'Aisyah Rahma', username: 'aisyah_rahma', email: 'aisyah@email.com', telepon: '', bio: 'Seorang pelajar yang bersemangat untuk memperdalam ilmu agama Islam.', bahasa: 'id', zona: 'WIB' };
+const AKUN_DEFAULT = { nama: '', username: '', email: '', telepon: '', bio: '', bahasa: 'id', zona: 'WIB' };
 
 function loadAkun() {
-  // Priority: saved settings > current user > default
   const user = getCurrentUser();
+  // Selalu prioritaskan data user yang login, localStorage hanya untuk telepon/bio/bahasa/zona
   const saved = JSON.parse(localStorage.getItem('sett_akun') || 'null');
-  const data = saved || (user ? { nama: user.nama, username: user.username, email: user.email, telepon: '', bio: '', bahasa: 'id', zona: 'WIB' } : AKUN_DEFAULT);
+  const data = {
+    nama: user?.nama || saved?.nama || '',
+    username: user?.username || saved?.username || '',
+    email: user?.email || saved?.email || '',
+    telepon: saved?.telepon || '',
+    bio: saved?.bio || '',
+    bahasa: saved?.bahasa || 'id',
+    zona: saved?.zona || 'WIB',
+  };
   document.getElementById('namaLengkap').value = data.nama || '';
   document.getElementById('username').value = data.username || '';
   document.getElementById('email').value = data.email || '';
