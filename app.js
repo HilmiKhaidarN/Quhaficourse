@@ -97,6 +97,11 @@ async function handleLogin(e) {
   e.preventDefault();
   if (!_supabase) { showAuthError('loginError', '❌ Koneksi ke server gagal.'); return; }
 
+  const btn = e.target.querySelector('button[type="submit"]');
+  if (btn?.disabled) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
+  const resetBtn = () => { if (btn) { btn.disabled = false; btn.textContent = 'Masuk'; } };
+
   const identifier = document.getElementById('loginIdentifier').value.trim();
   const password = document.getElementById('loginPass').value;
 
@@ -112,7 +117,7 @@ async function handleLogin(e) {
 
     if (!profile?.email) {
       showAuthError('loginError', '❌ Email/username atau password salah.');
-      return;
+      resetBtn(); return;
     }
     email = profile.email;
   }
@@ -120,7 +125,7 @@ async function handleLogin(e) {
   const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
   if (error) {
     showAuthError('loginError', '❌ Email/username atau password salah.');
-    return;
+    resetBtn(); return;
   }
 
   await _fetchAndCacheProfile(data.user.id, data.user.email);
@@ -134,20 +139,26 @@ async function handleRegister(e) {
   e.preventDefault();
   if (!_supabase) { showAuthError('regError', '❌ Koneksi ke server gagal.'); return; }
 
+  const btn = e.target.querySelector('button[type="submit"]');
+  if (btn?.disabled) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
+
   const nama = document.getElementById('regNama').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const username = document.getElementById('regUsername').value.trim();
   const pass = document.getElementById('regPass').value;
   const pass2 = document.getElementById('regPass2').value;
 
+  const resetBtn = () => { if (btn) { btn.disabled = false; btn.textContent = 'Daftar'; } };
+
   if (!nama || !email || !username || !pass) {
-    showAuthError('regError', '❌ Semua field wajib diisi.'); return;
+    showAuthError('regError', '❌ Semua field wajib diisi.'); resetBtn(); return;
   }
   if (pass.length < 6) {
-    showAuthError('regError', '❌ Password minimal 6 karakter.'); return;
+    showAuthError('regError', '❌ Password minimal 6 karakter.'); resetBtn(); return;
   }
   if (pass !== pass2) {
-    showAuthError('regError', '❌ Konfirmasi password tidak cocok.'); return;
+    showAuthError('regError', '❌ Konfirmasi password tidak cocok.'); resetBtn(); return;
   }
 
   // Cek username sudah dipakai
@@ -157,14 +168,14 @@ async function handleRegister(e) {
     .eq('username', username)
     .single();
   if (existing) {
-    showAuthError('regError', '❌ Username sudah digunakan.'); return;
+    showAuthError('regError', '❌ Username sudah digunakan.'); resetBtn(); return;
   }
 
   // SignUp
   const { data, error } = await _supabase.auth.signUp({ email, password: pass });
   if (error) {
     showAuthError('regError', '❌ ' + (error.message.includes('already') ? 'Email sudah terdaftar.' : error.message));
-    return;
+    resetBtn(); return;
   }
 
   // Insert profile
@@ -181,7 +192,7 @@ async function handleRegister(e) {
 
   if (profileErr) {
     showAuthError('regError', '❌ Gagal menyimpan profil. Coba lagi.');
-    return;
+    resetBtn(); return;
   }
 
   await _fetchAndCacheProfile(data.user.id, email);
