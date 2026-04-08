@@ -38,7 +38,11 @@ async function _fetchAndCacheProfile(userId, email) {
 // Setup auth state listener
 let _authReady = false;
 let _authReadyResolve;
-const _authReadyPromise = new Promise(r => { _authReadyResolve = r; });
+// Timeout 2s supaya tidak stuck jika browser blokir storage (tracking prevention)
+const _authReadyPromise = Promise.race([
+  new Promise(r => { _authReadyResolve = r; }),
+  new Promise(r => setTimeout(r, 2000))
+]);
 
 if (_supabase) {
   _supabase.auth.onAuthStateChange(async (event, session) => {
@@ -47,10 +51,10 @@ if (_supabase) {
     } else {
       _currentUserCache = null;
     }
-    if (!_authReady) { _authReady = true; _authReadyResolve(); }
+    if (!_authReady) { _authReady = true; if (_authReadyResolve) _authReadyResolve(); }
   });
 } else {
-  _authReady = true; _authReadyResolve();
+  _authReady = true; if (_authReadyResolve) _authReadyResolve();
 }
 
 // ============================================================
