@@ -35,27 +35,9 @@ async function _fetchAndCacheProfile(userId, email) {
   return _currentUserCache;
 }
 
-// Setup auth state listener
-let _authReady = false;
-let _authReadyResolve;
-// Timeout 2s supaya tidak stuck jika browser blokir storage (tracking prevention)
-const _authReadyPromise = Promise.race([
-  new Promise(r => { _authReadyResolve = r; }),
-  new Promise(r => setTimeout(r, 2000))
-]);
+// Setup auth state listener — dihapus untuk menghindari lock conflict dengan signInWithPassword
+// Semua auth state di-handle manual via _fetchAndCacheProfile
 
-if (_supabase) {
-  _supabase.auth.onAuthStateChange(async (event, session) => {
-    if (session?.user) {
-      if (!_currentUserCache) await _fetchAndCacheProfile(session.user.id, session.user.email);
-    } else {
-      _currentUserCache = null;
-    }
-    if (!_authReady) { _authReady = true; if (_authReadyResolve) _authReadyResolve(); }
-  });
-} else {
-  _authReady = true; if (_authReadyResolve) _authReadyResolve();
-}
 
 // ============================================================
 // AUTH HELPERS (backward compatible)
