@@ -34,7 +34,8 @@
 <script src="icons.js"></script>
 <script src="app.js"></script>
 <script>
-(async () => { await initLayout('materi'); })();
+(async () => {
+  await initLayout('materi');
 
 const PENGAJAR = {
   fikih:   'Afifah Adawiyyah',
@@ -68,8 +69,8 @@ const DATA = {
     { icon: IC.heart,    bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 3', title: 'Sabar (Ash-Shabr)',           desc: 'Tiga jenis sabar dan cara melatih kesabaran dalam kehidupan.',            pct: 0, fill: '', href: 'belajar-akhlak.html' },
     { icon: IC.star,     bg: 'linear-gradient(135deg,#fef9e7,#f5e6b0)', color: '#c9a227', bab: 'Bab 4', title: 'Syukur (Asy-Syukr)',          desc: 'Hakikat syukur dan cara bersyukur kepada Allah ?.',                       pct: 0, fill: '', href: 'belajar-akhlak.html' },
     { icon: IC.user,     bg: 'linear-gradient(135deg,#e8f4fd,#bee3f8)', color: '#2980b9', bab: 'Bab 5', title: 'Tawadhu\' (Rendah Hati)',     desc: 'Keutamaan rendah hati dan bahaya sombong dalam Islam.',                   pct: 0, fill: '', href: 'belajar-akhlak.html' },
-    { icon: IC.scale,    bg: 'linear-gradient(135deg,#fce8e8,#f5c6c6)', color: '#c0392b', bab: 'Bab 6', title: 'Akhlak Tercela',              desc: 'Ghibah, namimah, hasad, riya\' — akhlak yang harus dihindari.',           pct: 0, fill: '', href: 'belajar-akhlak.html' },
-    { icon: IC.bookOpen, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 7', title: 'Akhlak kepada Orang Tua',    desc: 'Birrul walidain — berbakti kepada orang tua dalam Islam.',                pct: 0, fill: '', href: 'belajar-akhlak.html' },
+    { icon: IC.scale,    bg: 'linear-gradient(135deg,#fce8e8,#f5c6c6)', color: '#c0392b', bab: 'Bab 6', title: 'Akhlak Tercela',              desc: 'Ghibah, namimah, hasad, riya\' ï¿½ akhlak yang harus dihindari.',           pct: 0, fill: '', href: 'belajar-akhlak.html' },
+    { icon: IC.bookOpen, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 7', title: 'Akhlak kepada Orang Tua',    desc: 'Birrul walidain ï¿½ berbakti kepada orang tua dalam Islam.',                pct: 0, fill: '', href: 'belajar-akhlak.html' },
   ],
   qurdis: [
     { icon: IC.bookOpen, bg: 'linear-gradient(135deg,#e8f5ee,#c8e6d4)', color: '#1a6b3c', bab: 'Bab 1', title: "Pengertian & Sejarah Al-Qur'an", desc: "Pengertian, nama-nama, dan sejarah turunnya Al-Qur'an.",          pct: 0, fill: '', href: 'belajar-qurdis.html' },
@@ -121,6 +122,7 @@ document.querySelectorAll('.materi-tab').forEach((tab, i) => {
 });
 
 renderCards('fikih');
+})();
 </script>
 </body>
 </html>

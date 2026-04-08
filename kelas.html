@@ -32,15 +32,16 @@
 <script src="icons.js"></script>
 <script src="app.js"></script>
 <script>
-(async () => { await initLayout('kelas'); })();
-initTabs('#kelasTabs');
+(async () => {
+  await initLayout('kelas');
+  initTabs('#kelasTabs');
 
-const KURSUS_LIST = [
-  { key:'fikih',   icon: IC.scale,    bg: '#e8f5ee', color: '#1a6b3c', title: 'Fikih',                    meta: 'Afifah Adawiyyah · 12 Materi · 10 Jam',         totalMat: 12, fill: '',       href: 'belajar-thaharah.html' },
-  { key:'akidah',  icon: IC.moon,     bg: '#e8f5ee', color: '#1a6b3c', title: 'Akidah',                   meta: 'Soni Sultansah · 8 Materi · 7 Jam',              totalMat: 8,  fill: '',       href: 'belajar-akidah.html' },
-  { key:'akhlak',  icon: IC.heart,    bg: '#fef9e7', color: '#c9a227', title: 'Akhlak',                   meta: 'Farah Fathia Salimatul Haq · 10 Materi · 8 Jam', totalMat: 10, fill: 'gold',   href: 'belajar-akhlak.html' },
-  { key:'qurdis',  icon: IC.book,     bg: '#e8f5ee', color: '#1a6b3c', title: 'Quran Hadits',             meta: 'Putri Salsabilah Agasha · 15 Materi · 12 Jam',   totalMat: 15, fill: '',       href: 'belajar-qurdis.html' },
-  { key:'sejarah', icon: IC.landmark, bg: '#fef9e7', color: '#c9a227', title: 'Sejarah Kebudayaan Islam', meta: 'Abdul Lathif Ahmad Hamid · 7 Materi · 6 Jam',    totalMat: 7,  fill: 'orange', href: 'belajar-sejarah.html' },
+  const KURSUS_LIST = [
+  { key:'fikih',   icon: IC.scale,    bg: '#e8f5ee', color: '#1a6b3c', title: 'Fikih',                    meta: 'Afifah Adawiyyah ï¿½ 12 Materi ï¿½ 10 Jam',         totalMat: 12, fill: '',       href: 'belajar-thaharah.html' },
+  { key:'akidah',  icon: IC.moon,     bg: '#e8f5ee', color: '#1a6b3c', title: 'Akidah',                   meta: 'Soni Sultansah ï¿½ 8 Materi ï¿½ 7 Jam',              totalMat: 8,  fill: '',       href: 'belajar-akidah.html' },
+  { key:'akhlak',  icon: IC.heart,    bg: '#fef9e7', color: '#c9a227', title: 'Akhlak',                   meta: 'Farah Fathia Salimatul Haq ï¿½ 10 Materi ï¿½ 8 Jam', totalMat: 10, fill: 'gold',   href: 'belajar-akhlak.html' },
+  { key:'qurdis',  icon: IC.book,     bg: '#e8f5ee', color: '#1a6b3c', title: 'Quran Hadits',             meta: 'Putri Salsabilah Agasha ï¿½ 15 Materi ï¿½ 12 Jam',   totalMat: 15, fill: '',       href: 'belajar-qurdis.html' },
+  { key:'sejarah', icon: IC.landmark, bg: '#fef9e7', color: '#c9a227', title: 'Sejarah Kebudayaan Islam', meta: 'Abdul Lathif Ahmad Hamid ï¿½ 7 Materi ï¿½ 6 Jam',    totalMat: 7,  fill: 'orange', href: 'belajar-sejarah.html' },
 ];
 
 function renderKelas(filter) {
@@ -70,7 +71,7 @@ function renderKelas(filter) {
         <div class="ki-meta">${i.meta}</div>
         <div class="ki-progress">
           <div class="progress-bar"><div class="progress-fill ${i.fill}" style="width:${i.pct}%"></div></div>
-          <span>${i.pct}% · ${done}/${i.totalMat} Materi</span>
+          <span>${i.pct}% ï¿½ ${done}/${i.totalMat} Materi</span>
         </div>
       </div>
       <div class="ki-action">
@@ -86,6 +87,7 @@ document.querySelectorAll('#kelasTabs .tab-btn').forEach(btn => {
 });
 
 renderKelas('Aktif');
+})();
 </script>
 </body>
 </html>

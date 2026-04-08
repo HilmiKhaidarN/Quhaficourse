@@ -78,14 +78,14 @@
 <script src="icons.js"></script>
 <script src="app.js"></script>
 <script>
-initLayout('profil');
-document.getElementById('profilAvatar').innerHTML = IC.userCircle;
-document.getElementById('ir1').innerHTML = IC.user;
-document.getElementById('ir2').innerHTML = IC.mail;
-document.getElementById('ir3').innerHTML = IC.tag;
-document.getElementById('ir4').innerHTML = IC.mapPin;
-
 (async () => {
+  await initLayout('profil');
+  document.getElementById('profilAvatar').innerHTML = IC.userCircle;
+  document.getElementById('ir1').innerHTML = IC.user;
+  document.getElementById('ir2').innerHTML = IC.mail;
+  document.getElementById('ir3').innerHTML = IC.tag;
+  document.getElementById('ir4').innerHTML = IC.mapPin;
+
   if (_supabase) {
     const { data: { session } } = await _supabase.auth.getSession();
     if (session && !_currentUserCache) await _fetchAndCacheProfile(session.user.id, session.user.email);
