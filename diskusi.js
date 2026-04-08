@@ -635,17 +635,17 @@ async function migrateLocalStorageToSupabase() {
 // ============================================================
 // INIT
 // ============================================================
-initLayout('diskusi');
-document.getElementById('iconPlus').innerHTML = IC.plus;
-document.getElementById('iconSearch').innerHTML = IC.search;
-document.getElementById('newTitle').addEventListener('input', function () {
-  document.getElementById('titleChar').textContent = this.value.length + '/120';
-});
-document.getElementById('newBody').addEventListener('input', function () {
-  document.getElementById('bodyChar').textContent = this.value.length + '/1000';
-});
-
 (async () => {
+  await initLayout('diskusi');
+  document.getElementById('iconPlus').innerHTML = IC.plus;
+  document.getElementById('iconSearch').innerHTML = IC.search;
+  document.getElementById('newTitle').addEventListener('input', function () {
+    document.getElementById('titleChar').textContent = this.value.length + '/120';
+  });
+  document.getElementById('newBody').addEventListener('input', function () {
+    document.getElementById('bodyChar').textContent = this.value.length + '/1000';
+  });
+
   const cu = getCurrentUser();
   if (cu) await loadUserLikes(cu.username);
   await loadThreads();

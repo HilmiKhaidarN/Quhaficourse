@@ -3,28 +3,28 @@
 // ============================================================
 
 // --- INIT ---
-initLayout('pengaturan');
-// Tab icons
-document.getElementById('ti1').innerHTML = IC.user;
-document.getElementById('ti2').innerHTML = IC.bell;
-document.getElementById('ti3').innerHTML = IC.lock;
-document.getElementById('ti4').innerHTML = IC.settings;
+(async () => {
+  await initLayout('pengaturan');
 
-// Eye icons for password fields
-['eyeLama','eyeBaru','eyeKonfirm'].forEach(id => {
-  document.getElementById(id).innerHTML = IC.eye;
-});
+  // Tab icons
+  document.getElementById('ti1').innerHTML = IC.user;
+  document.getElementById('ti2').innerHTML = IC.bell;
+  document.getElementById('ti3').innerHTML = IC.lock;
+  document.getElementById('ti4').innerHTML = IC.settings;
 
-// Camera icon
-document.getElementById('camIcon').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+  ['eyeLama','eyeBaru','eyeKonfirm'].forEach(id => {
+    document.getElementById(id).innerHTML = IC.eye;
+  });
 
-// Load saved data
-loadAkun();
-loadAvatar();
-renderNotifToggles();
-renderPrivasiToggles();
-renderSessions();
-load2FA();
+  document.getElementById('camIcon').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+
+  loadAkun();
+  loadAvatar();
+  renderNotifToggles();
+  renderPrivasiToggles();
+  renderSessions();
+  load2FA();
+})();
 
 // --- TABS ---
 function switchTab(name, el) {

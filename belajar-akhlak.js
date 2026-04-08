@@ -716,8 +716,9 @@ function showResult() {
   renderSidebar();
 }
 
-initLayout('materi');
-renderSidebar();
-renderLesson(0);
-
+(async () => {
+  await initLayout('materi');
+  renderSidebar();
+  renderLesson(0);
+})();
 

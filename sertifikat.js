@@ -66,9 +66,8 @@ let ALL_SERTIFIKAT = buildSertifikat();
 let activeTab = 'diperoleh';
 let currentCert = null;
 
-initLayout('sertifikat');
-// Tunggu progress dari Supabase sebelum render
 (async () => {
+  await initLayout('sertifikat');
   await loadAllProgress();
   renderGrid();
 })();

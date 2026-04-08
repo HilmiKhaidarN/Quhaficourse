@@ -423,5 +423,7 @@ function renderReview(quiz, answers) {
 // ============================================================
 // INIT
 // ============================================================
-initLayout('kuis');
-renderList();
+(async () => {
+  await initLayout('kuis');
+  renderList();
+})();
