@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -65,7 +65,7 @@
     </main>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+<script src="supabase.min.js">
 </script>
 <script src="supabase-config.js"></script>
 <script src="icons.js"></script>
@@ -101,7 +101,7 @@ document.getElementById('courseGrid').innerHTML = KURSUS.map(c => {
   </div>`;
 }).join('');
 
-// Lanjutkan Belajar � hanya tampil kursus yang sudah dimulai (progress > 0)
+// Lanjutkan Belajar ? hanya tampil kursus yang sudah dimulai (progress > 0)
 const CONT_LABELS = { fikih:'Fikih: Thaharah', akidah:'Akidah: Rukun Iman', akhlak:'Akhlak: Pengertian Akhlak', qurdis:'Quran Hadits: Al-Qur\'an', sejarah:'Sejarah: Pra-Islam' };
 const started = KURSUS.filter(c => parseInt(localStorage.getItem('progress_' + c.key) || '0', 10) > 0);
 const continueEl = document.getElementById('continueList');

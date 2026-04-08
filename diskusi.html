@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -30,7 +30,7 @@
             <button class="dtab active" onclick="filterThread('terbaru',this)">Terbaru</button>
             <button class="dtab" onclick="filterThread('populer',this)">Populer</button>
             <button class="dtab" onclick="filterThread('belum',this)">Belum Dijawab</button>
-            <button class="dtab" onclick="filterThread('terjawab',this)">✅ Terjawab</button>
+            <button class="dtab" onclick="filterThread('terjawab',this)">? Terjawab</button>
           </div>
           <div class="diskusi-search">
             <span id="iconSearch"></span>
@@ -63,7 +63,7 @@
   <div class="diskusi-modal" onclick="event.stopPropagation()">
     <div class="dm-header">
       <h3>Buat Diskusi Baru</h3>
-      <button class="dm-close" onclick="closeModal()">✕</button>
+      <button class="dm-close" onclick="closeModal()">?</button>
     </div>
     <div class="dm-body">
       <div class="dm-field">
@@ -86,9 +86,9 @@
         <label>Label</label>
         <select id="newLabel">
           <option value="">Tanpa label</option>
-          <option value="Pertanyaan">❓ Pertanyaan</option>
-          <option value="Diskusi">💬 Diskusi</option>
-          <option value="Pengumuman">📢 Pengumuman</option>
+          <option value="Pertanyaan">? Pertanyaan</option>
+          <option value="Diskusi">?? Diskusi</option>
+          <option value="Pengumuman">?? Pengumuman</option>
         </select>
       </div>
       <div class="dm-field">
@@ -107,7 +107,7 @@
 <!-- TOAST -->
 <div class="diskusi-toast" id="diskusiToast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.min.js"></script>
 <script src="supabase-config.js"></script>
 <script src="icons.js"></script>
 <script src="app.js"></script>
