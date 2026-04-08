@@ -86,7 +86,6 @@ async function requireAuth(adminOnly = false) {
 
 async function requireGuest() {
   if (!_supabase) return;
-  await _authReadyPromise;
   const { data: { session } } = await _supabase.auth.getSession();
   if (session) {
     if (!_currentUserCache) await _fetchAndCacheProfile(session.user.id, session.user.email);
@@ -132,7 +131,14 @@ async function handleLogin(e) {
     resetBtn(); return;
   }
 
-  await _fetchAndCacheProfile(data.user.id, data.user.email);
+  // Fetch profile dengan timeout 5s, kalau gagal tetap redirect ke dashboard
+  try {
+    await Promise.race([
+      _fetchAndCacheProfile(data.user.id, data.user.email),
+      new Promise((_, reject) => setTimeout(() => reject('timeout'), 5000))
+    ]);
+  } catch (_) { /* timeout atau gagal, tetap lanjut */ }
+
   window.location.href = _currentUserCache?.role === 'Admin' ? 'admin.html' : 'dashboard.html';
 }
 
