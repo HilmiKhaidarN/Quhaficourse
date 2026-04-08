@@ -36,14 +36,21 @@ async function _fetchAndCacheProfile(userId, email) {
 }
 
 // Setup auth state listener
+let _authReady = false;
+let _authReadyResolve;
+const _authReadyPromise = new Promise(r => { _authReadyResolve = r; });
+
 if (_supabase) {
   _supabase.auth.onAuthStateChange(async (event, session) => {
     if (session?.user) {
-      await _fetchAndCacheProfile(session.user.id, session.user.email);
+      if (!_currentUserCache) await _fetchAndCacheProfile(session.user.id, session.user.email);
     } else {
       _currentUserCache = null;
     }
+    if (!_authReady) { _authReady = true; _authReadyResolve(); }
   });
+} else {
+  _authReady = true; _authReadyResolve();
 }
 
 // ============================================================
@@ -61,14 +68,13 @@ function saveUsers(u) { localStorage.setItem('qc_users', JSON.stringify(u)); }
 // ============================================================
 async function requireAuth(adminOnly = false) {
   if (!_supabase) return;
+  await _authReadyPromise;
   const { data: { session } } = await _supabase.auth.getSession();
   if (!session) {
     window.location.href = 'index.html';
     return;
   }
-  if (!_currentUserCache) {
-    await _fetchAndCacheProfile(session.user.id, session.user.email);
-  }
+  if (!_currentUserCache) await _fetchAndCacheProfile(session.user.id, session.user.email);
   if (adminOnly && _currentUserCache?.role !== 'Admin') {
     window.location.href = 'dashboard.html';
   }
@@ -76,11 +82,10 @@ async function requireAuth(adminOnly = false) {
 
 async function requireGuest() {
   if (!_supabase) return;
+  await _authReadyPromise;
   const { data: { session } } = await _supabase.auth.getSession();
   if (session) {
-    if (!_currentUserCache) {
-      await _fetchAndCacheProfile(session.user.id, session.user.email);
-    }
+    if (!_currentUserCache) await _fetchAndCacheProfile(session.user.id, session.user.email);
     window.location.href = _currentUserCache?.role === 'Admin' ? 'admin.html' : 'dashboard.html';
   }
 }
